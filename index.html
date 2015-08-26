@@ -1,0 +1,215 @@
+<html>
+  <head>
+    <title>WebGL Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+
+	  <!--jQuery Easy UI Scripts -->
+	  <link rel="stylesheet" type="text/css" href="lib/jquery.easyui/themes/black/easyui.css">
+	  <link rel="stylesheet" type="text/css" href="lib/jquery.easyui/themes/icon.css">
+	  <script type="text/javascript" src="lib/jquery.easyui/jquery.min.js"></script>
+	  <script type="text/javascript" src="lib/jquery.easyui/jquery.easyui.min.js"></script>
+	  
+	  <!--WebGL Scripts -->
+    <script src="js/gl/sylvester.js" type="text/javascript"></script>
+    <script src="js/gl/glUtils.js" type="text/javascript"></script>
+    <script src="js/gl/main.js" type="text/javascript"></script>
+
+    <!-- Fragment shader program -->
+    <script id="shader-fs" type="x-shader/x-fragment">
+    	varying highp vec4 vColor;
+      varying highp vec3 vLighting;
+	  
+      void main(void) {
+        gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
+		}
+    </script>
+    
+    <!-- Vertex shader program -->
+    <script id="shader-vs" type="x-shader/x-vertex">
+      attribute vec3 aVertexPosition;
+      attribute vec4 aVertexColor;
+	  attribute highp vec3 aVertexNormal;
+    
+      uniform highp mat4 uNormalMatrix;
+      uniform highp mat4 uMVMatrix;
+      uniform highp mat4 uPMatrix;
+      
+			varying highp vec4 vColor;
+			varying highp vec3 vLighting;
+    
+      void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vColor = aVertexColor;
+		
+        // Apply lighting effect
+        
+        highp vec3 ambientLight = vec3(0.5);
+        highp vec3 directionalLightColor = vec3(0.5, 0.5, 0.75);
+        highp vec3 directionalVector = vec3(0.85, 0.8, 0.75);
+        
+        highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+        
+        highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+        vLighting = ambientLight + (directionalLightColor * directional);
+      }
+    </script>
+  </head>
+  
+<body onload="start('glcanvas')" >
+<body class="easyui-layout">
+  
+	<div data-options="region:'north',border:false," style="height:40px">
+		<div class="easyui-panel" style="padding:5px;">
+		<a href="#" class="easyui-menubutton" data-options="plain:true,menu:'#mm_file',iconCls:'icon-file'">File</a>
+		<a href="#" class="easyui-menubutton" data-options="menu:'#mm1',iconCls:'icon-edit'">Edit</a>
+		<a href="#" class="easyui-menubutton" data-options="menu:'#mm2',iconCls:'icon-help'">Help</a>
+	</div>
+
+<!-- FILE -->
+	<div id="mm_file" style="width:100px;">
+		<div>New</div>
+		<div>Open</div>
+		<div class="menu-sep"></div>
+    <div data-options="iconCls:'icon-undo'">Import</div>
+		<div  data-options="iconCls:'icon-redo'">
+  		<span>Export</span>
+	  		<div>
+		  		<div onclick="$('#w').window('open')">STL (*.stl)</div>
+
+			  	<div onclick = "ResetPropGrid()">IGS (*.iges)</div>
+				  <div>STEP (*.stp)</div>
+				  <div class="menu-sep"></div>
+				  <div>New Toolbar...</div>
+			  </div>
+		  </div>
+	  </div>
+
+<!-- EDIT -->	  
+	<div id="mm1" style="width:150px;">
+		<div data-options="iconCls:'icon-undo'">Undo</div>
+		<div data-options="iconCls:'icon-redo'">Redo</div>
+		<div class="menu-sep"></div>
+		<div>Cut</div>
+		<div>Copy</div>
+		<div>Paste</div>
+		<div class="menu-sep"></div>
+		<div>
+			<span>Toolbar</span>
+			<div>
+				<div>Address</div>
+				<div>Link</div>
+				<div>Navigation Toolbar</div>
+				<div>Bookmark Toolbar</div>
+				<div class="menu-sep"></div>
+				<div>New Toolbar...</div>
+			</div>
+		</div>
+		<div data-options="iconCls:'icon-remove'">Delete</div>
+		<div>Select All</div>
+	</div>
+	
+<!-- ABOUT -->	
+	<div id="mm2" style="width:100px;">
+		<div>Help</div>
+		<div>About</div>
+	</div>
+	</div>
+	
+	<script type="text/javascript">
+	function ResetPropGrid()
+	{
+	var row = {
+  name:'AddName',
+  value:'',
+  group:'Marketing Settings',
+  editor:'text'
+};
+$('#pg').propertygrid('appendRow',row);
+	}</script>
+	
+  <div id="w" class="easyui-window" title="Modal Window" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
+    The window content.
+  </div>
+	
+	<div data-options="region:'west',split:true,title:'West'" style="width:200px;">
+	  	<div class="easyui-panel" style="padding:5px">
+		<ul class="easyui-tree">
+			<li>
+				<span>My Documents</span>
+				<ul>
+					<li data-options="state:'closed'">
+						<span>Photos</span>
+						<ul>
+							<li>
+								<span>Friend</span>
+							</li>
+							<li>
+								<span>Wife</span>
+							</li>
+							<li>
+								<span>Company</span>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<span>Program Files</span>
+						<ul>
+							<li>Intel</li>
+							<li>Java</li>
+							<li>Microsoft Office</li>
+							<li>Games</li>
+						</ul>
+					</li>
+					<li>index.html</li>
+					<li>about.html</li>
+					<li>welcome.html</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	</div>
+	
+	
+	
+	
+	
+	
+	<div data-options="region:'east',split:true,title:'East'" style="width:200px;">
+		<div class="easyui-accordion" data-options="fit:true,border:false">
+			<div title="Title1" style="padding:0px;">
+						<table id="pg" class="easyui-propertygrid" data-options="
+				      url:'propertygrid_data1.json',
+				      method:'get',
+				      showGroup:true,
+				      scrollbarSize:0
+			        ">
+          	</table>
+			</div>
+			<div title="Title2" data-options="selected:true" style="padding:10px;">
+					content2
+			</div>
+			<div title="Title3" style="padding:10px">
+					content3
+			</div>
+		</div>
+	</div>
+	
+	<div data-options="region:'south', split:true,collapsed:true,title:'Console'" style="height:150px;background:#A9FACD;padding:10px;">south region</div>
+	<div data-options="region:'center',title:'Center',
+			onResize:function(){
+		    var canvas = document.getElementById('glcanvas');
+		      canvas.style.width='99%';
+          canvas.style.height='99%';
+          canvas.width  = canvas.offsetWidth;
+          canvas.height = canvas.offsetHeight;
+        console.log(canvas.width);
+			}">
+	   <canvas id="glcanvas" width = 1280 height =720>
+        Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
+      </canvas>
+      
+	</div>
+  </body>
+</body>
+</html>
