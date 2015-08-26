@@ -56,13 +56,27 @@
     </script>
   </head>
   
-<body onload="start('glcanvas')" >
+  <script>
+    function OnLoadScript()
+    {
+      console.log("Init WebGL");
+      start('glcanvas');
+      
+      var pg = $('#pg');
+pg.propertygrid('appendRow',{name:'n11',value:'v12',editor:'text',group:'2 ID Settings'});
+var data = pg.propertygrid('getData');
+pg.propertygrid('loadData', data);
+    }
+  </script>
+  
+<body onload="OnLoadScript()">
 <body class="easyui-layout">
   
 	<div data-options="region:'north',border:false," style="height:40px">
 		<div class="easyui-panel" style="padding:5px;">
 		<a href="#" class="easyui-menubutton" data-options="plain:true,menu:'#mm_file',iconCls:'icon-file'">File</a>
 		<a href="#" class="easyui-menubutton" data-options="menu:'#mm1',iconCls:'icon-edit'">Edit</a>
+		<a href="#" class="easyui-menubutton" data-options="menu:'#mm1',iconCls:'icon-edit'">Tools</a>
 		<a href="#" class="easyui-menubutton" data-options="menu:'#mm2',iconCls:'icon-help'">Help</a>
 	</div>
 
@@ -114,19 +128,7 @@
 		<div>Help</div>
 		<div>About</div>
 	</div>
-	</div>
-	
-	<script type="text/javascript">
-	function ResetPropGrid()
-	{
-	var row = {
-  name:'AddName',
-  value:'',
-  group:'Marketing Settings',
-  editor:'text'
-};
-$('#pg').propertygrid('appendRow',row);
-	}</script>
+</div>
 	
   <div id="w" class="easyui-window" title="Modal Window" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
     The window content.
@@ -170,17 +172,12 @@ $('#pg').propertygrid('appendRow',row);
 	</div>
 	</div>
 	
-	
-	
-	
-	
-	
-	<div data-options="region:'east',split:true,title:'East'" style="width:200px;">
+	<div data-options="region:'east',split:true,title:'East'" style="width:300px;">
 		<div class="easyui-accordion" data-options="fit:true,border:false">
 			<div title="Title1" style="padding:0px;">
 						<table id="pg" class="easyui-propertygrid" data-options="
-				      url:'propertygrid_data1.json',
-				      method:'get',
+									url:'http://127.0.0.1:51792/WebGLModelView/propertygrid_data1.json',
+				method:'get',	
 				      showGroup:true,
 				      scrollbarSize:0
 			        ">
@@ -203,7 +200,6 @@ $('#pg').propertygrid('appendRow',row);
           canvas.style.height='99%';
           canvas.width  = canvas.offsetWidth;
           canvas.height = canvas.offsetHeight;
-        console.log(canvas.width);
 			}">
 	   <canvas id="glcanvas" width = 1280 height =720>
         Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
