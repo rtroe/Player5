@@ -10,6 +10,8 @@
 	  <script type="text/javascript" src="lib/jquery.easyui/jquery.min.js"></script>
 	  <script type="text/javascript" src="lib/jquery.easyui/jquery.easyui.min.js"></script>
 	  
+    <script src="js/ui/OnLoad.js" type="text/javascript"></script>
+    
 	  <!--WebGL Scripts -->
     <script src="js/gl/sylvester.js" type="text/javascript"></script>
     <script src="js/gl/glUtils.js" type="text/javascript"></script>
@@ -56,18 +58,6 @@
     </script>
   </head>
   
-  <script>
-    function OnLoadScript()
-    {
-      console.log("Init WebGL");
-      start('glcanvas');
-      
-      var pg = $('#pg');
-pg.propertygrid('appendRow',{name:'n11',value:'v12',editor:'text',group:'2 ID Settings'});
-var data = pg.propertygrid('getData');
-pg.propertygrid('loadData', data);
-    }
-  </script>
   
 <body onload="OnLoadScript()">
 <body class="easyui-layout">
@@ -83,17 +73,15 @@ pg.propertygrid('loadData', data);
 <!-- FILE -->
 	<div id="mm_file" style="width:100px;">
 		<div>New</div>
-		<div onclick="$('#w').window('open')">Open</div>
+		<div onclick="$('#modelForm_Open').window('open')">Open</div>
 		<div class="menu-sep"></div>
     <div data-options="iconCls:'icon-undo'">Import</div>
 		<div  data-options="iconCls:'icon-redo'">
   		<span>Export</span>
 	  		<div>
 		  		<div>STL (*.stl)</div>
-			  	<div onclick = "ResetPropGrid()">IGS (*.iges)</div>
+			  	<div>IGS (*.iges)</div>
 				  <div>STEP (*.stp)</div>
-				  <div class="menu-sep"></div>
-				  <div>New Toolbar...</div>
 			  </div>
 		  </div>
 	  </div>
@@ -129,95 +117,13 @@ pg.propertygrid('loadData', data);
 	</div>
 </div>
 	
-  <div id="w" class="easyui-window" title="Modal Window" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
-    <style>
-  #progress_bar {
-    margin: 10px 0;
-    padding: 3px;
-    border: 1px solid #000;
-    font-size: 14px;
-    clear: both;
-    opacity: 0;
-    -moz-transition: opacity 1s linear;
-    -o-transition: opacity 1s linear;
-    -webkit-transition: opacity 1s linear;
-  }
-  #progress_bar.loading {
-    opacity: 1.0;
-  }
-  #progress_bar .percent {
-    background-color: #99ccff;
-    height: auto;
-    width: 0;
-  }
-</style>
-
-<input type="file" id="files" name="file" />
-<button onclick="abortRead();">Cancel read</button>
-<div id="progress_bar"><div class="percent">0%</div></div>
-
-<script>
-  var reader;
-  var progress = document.querySelector('.percent');
-
-  function abortRead() {
-    reader.abort();
-  }
-
-  function errorHandler(evt) {
-    switch(evt.target.error.code) {
-      case evt.target.error.NOT_FOUND_ERR:
-        alert('File Not Found!');
-        break;
-      case evt.target.error.NOT_READABLE_ERR:
-        alert('File is not readable');
-        break;
-      case evt.target.error.ABORT_ERR:
-        break; // noop
-      default:
-        alert('An error occurred reading this file.');
-    };
-  }
-
-  function updateProgress(evt) {
-    // evt is an ProgressEvent.
-    if (evt.lengthComputable) {
-      var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
-      // Increase the progress bar length.
-      if (percentLoaded < 100) {
-        progress.style.width = percentLoaded + '%';
-        progress.textContent = percentLoaded + '%';
-      }
-    }
-  }
-
-  function handleFileSelect(evt) {
-    // Reset progress indicator on new file selection.
-    progress.style.width = '0%';
-    progress.textContent = '0%';
-
-    reader = new FileReader();
-    reader.onerror = errorHandler;
-    reader.onprogress = updateProgress;
-    reader.onabort = function(e) {
-      alert('File read cancelled');
-    };
-    reader.onloadstart = function(e) {
-      document.getElementById('progress_bar').className = 'loading';
-    };
-    reader.onload = function(e) {
-      // Ensure that the progress bar displays 100% at the end.
-      progress.style.width = '100%';
-      progress.textContent = '100%';
-      setTimeout("document.getElementById('progress_bar').className='';", 2000);
-    }
-
-    // Read in the image file as a binary string.
-    reader.readAsBinaryString(evt.target.files[0]);
-  }
-
-  document.getElementById('files').addEventListener('change', handleFileSelect, false);
-</script>
+  <div id="modelForm_Open" class="easyui-window" title="Modal Window" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
+    <input type="file" id="files" name="file" />
+      <div id="progress_bar"><div class="percent">0%</div></div>
+      <p align="right">
+        <button style="text-align:right" onclick="abortRead();">Cancel read</button>
+      </p>
+    <script src="js/ui/io_open.js" type="text/javascript"></script>
   </div>
 	
 	<div data-options="region:'west',split:true,title:'West'" style="width:200px;">
@@ -282,8 +188,8 @@ pg.propertygrid('loadData', data);
 	<div data-options="region:'center',title:'Center',
 			onResize:function(){
 		    var canvas = document.getElementById('glcanvas');
-		      canvas.style.width='99%';
-          canvas.style.height='99%';
+		      canvas.style.width='99.5%';
+          canvas.style.height='99.5%';
           canvas.width  = canvas.offsetWidth;
           canvas.height = canvas.offsetHeight;
 			}">
