@@ -1,5 +1,17 @@
 var reader;
   var progress = document.querySelector('.percent');
+  
+  var fileExtention;
+  
+  var EnumFileType = {
+    STL : 0,
+    ThreeDS : 1
+  };
+  
+  //Returns the File extension
+function getFileExtention(fileName){
+  return fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length)
+}
 
   function abortRead() {
     reader.abort();
@@ -19,7 +31,7 @@ var reader;
         alert('An error occurred reading this file.');
     };
   }
-
+  
   function updateProgress(evt) {
     // evt is an ProgressEvent.
     if (evt.lengthComputable) {
@@ -32,30 +44,58 @@ var reader;
     }
   }
 
+
   function handleFileSelect(evt) {
+    var IsFileASCII = true;
+    
+     //First Find Which File Type it is.
+      var fileExtention = getFileExtention(evt.target.files[0].name).toLowerCase();
+    
     // Reset progress indicator on new file selection.
     progress.style.width = '0%';
     progress.textContent = '0%';
 
+    //The File Reader
     reader = new FileReader();
     reader.onerror = errorHandler;
     reader.onprogress = updateProgress;
+    
+    //The function executed for file load abort
     reader.onabort = function(e) {
       alert('File read cancelled');
     };
+    
+    
+    //The Function Executed during loading
     reader.onloadstart = function(e) {
       document.getElementById('progress_bar').className = 'loading';
     };
+    
+    
+    //Function Executed After the File Has Been Loaded
     reader.onload = function(e) {
+      
+     
+      switch(fileExtention)
+      {
+        case "stl":
+          io_import_stl(this.result);
+          break;
+        default:
+        alert("File Type .'" + fileExtention + "' Not Supported.\nIf you would like this file type added, please contact us!");
+        break;
+      }
+      
+
       // Ensure that the progress bar displays 100% at the end.
       progress.style.width = '100%';
       progress.textContent = '100%';
       setTimeout("document.getElementById('progress_bar').className='';", 200);
-    }
+    };
 
     // Read in the image file as a binary string.
     //reader.readAsBinaryString(evt.target.files[0]);
-    reader.readAsText(evt.target.files[0], "UTF-16");
+    reader.readAsText(evt.target.files[0]);
   }
 
   document.getElementById('files').addEventListener('change', handleFileSelect, false);
