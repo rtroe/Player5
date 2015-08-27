@@ -62,17 +62,36 @@
 <body onload="OnLoadScript()">
 <body class="easyui-layout">
   
+<!-- 
+*****************************************************
+MAIN MENU
+*****************************************************
+-->
 	<div data-options="region:'north',border:false," style="height:40px">
 		<div class="easyui-panel" style="padding:5px;">
-		<a href="#" class="easyui-menubutton" data-options="plain:true,menu:'#mm_file',iconCls:'icon-file'">File</a>
-		<a href="#" class="easyui-menubutton" data-options="menu:'#mm1',iconCls:'icon-edit'">Edit</a>
-		<a href="#" class="easyui-menubutton" data-options="menu:'#mm1',iconCls:'icon-edit'">Tools</a>
-		<a href="#" class="easyui-menubutton" data-options="menu:'#mm2',iconCls:'icon-help'">Help</a>
+		<a href="#" class="easyui-menubutton" data-options="plain:false,menu:'#mm_main',iconCls:'icon-large-clipart'"></a>
+		<a href="#" class="easyui-menubutton" data-options="plain:true,menu:'#mm_file'">File</a>
+		<a href="#" class="easyui-menubutton" data-options="menu:'#mm_edit'">Edit</a>
+		<a href="#" class="easyui-menubutton" data-options="menu:'#mm_tools'">Tools</a>
+		<a href="#" class="easyui-menubutton" data-options="menu:'#mm2'">Help</a>
 	</div>
+	
+<!-- MAIN -->
+	<div id="mm_main" style="width:100px; align:right">
+		<div data-options="iconCls:'icon-man', size:'large'" onclick="$('#modelForm_Open').window('open')">Log In</div>
+		<div class="menu-sep"></div>
+    <div data-options="iconCls:'icon-undo'">Import</div>
+		<div  data-options="iconCls:'icon-redo'">
+  		<span>Export</span>
+	  		<div>
+		  		<div>STL (*.stl)</div>
+			  </div>
+		  </div>
+	  </div>	
 
 <!-- FILE -->
 	<div id="mm_file" style="width:100px;">
-		<div>New</div>
+		<div href="http://127.0.0.1:51792/WebGL-Model-View/index.html" target="_blank">New</div>
 		<div onclick="$('#modelForm_Open').window('open')">Open</div>
 		<div class="menu-sep"></div>
     <div data-options="iconCls:'icon-undo'">Import</div>
@@ -80,14 +99,13 @@
   		<span>Export</span>
 	  		<div>
 		  		<div>STL (*.stl)</div>
-			  	<div>IGS (*.iges)</div>
-				  <div>STEP (*.stp)</div>
 			  </div>
 		  </div>
 	  </div>
 
 <!-- EDIT -->	  
-	<div id="mm1" style="width:150px;">
+	<div id="mm_edit" style="width:150px;">
+	  <!--
 		<div data-options="iconCls:'icon-undo'">Undo</div>
 		<div data-options="iconCls:'icon-redo'">Redo</div>
 		<div class="menu-sep"></div>
@@ -108,12 +126,19 @@
 		</div>
 		<div data-options="iconCls:'icon-remove'">Delete</div>
 		<div>Select All</div>
+		 -->	  
 	</div>
 	
+	<!-- TOOLS -->	
+	<div id="mm_tools" style="width:100px;">
+		<div>Measure</div>
+	</div>
+</div>
+
 <!-- ABOUT -->	
 	<div id="mm2" style="width:100px;">
 		<div>Help</div>
-		<div>About</div>
+		<div onclick="$('#modelForm_About').window('open')">About</div>
 	</div>
 </div>
 	
@@ -125,6 +150,23 @@
       </p>
     <script src="js/ui/io_open.js" type="text/javascript"></script>
   </div>
+  
+  
+    <div id="modelForm_About" class="easyui-window" title="About : Vertices Viewer v. 0.1" data-options="modal:true,closed:true,iconCls:'icon-man'" style="width:500px;height:200px;padding:10px;">
+  <b>
+    Vertices Viewer v 0.1 (Beta)
+    </b>
+  <p>
+    Vertices Viewer is an all in one model viewer for video game and 3D models. 
+  It is meant to be a model viewer and light weight editor for lighting values and
+  texture types.
+  </p>
+  </div>
+  
+  
+  
+  
+  
 	
 	<div data-options="region:'west',split:true,title:'West'" style="width:200px;">
 	  	<div class="easyui-panel" style="padding:5px">
@@ -164,9 +206,9 @@
 	</div>
 	</div>
 	
-	<div data-options="region:'east',split:true,title:'East'" style="width:300px;">
+	<div data-options="region:'east',split:true,title:'Model Properties'" style="width:300px;">
 		<div class="easyui-accordion" data-options="fit:true,border:false">
-			<div title="Title1" style="padding:0px;">
+			<div title="Properties" style="padding:0px;">
 						<table id="pg" class="easyui-propertygrid" data-options="
 									url:'http://127.0.0.1:51792/WebGL-Model-View/propertygrid_data1.json',
 				method:'get',	
@@ -175,7 +217,7 @@
 			        ">
           	</table>
 			</div>
-			<div title="Title2" data-options="selected:true" style="padding:10px;">
+			<div title="Textures" data-options="selected:true" style="padding:10px;">
 					content2
 			</div>
 			<div title="Title3" style="padding:10px">
@@ -185,18 +227,93 @@
 	</div>
 	
 	<div data-options="region:'south', split:true,collapsed:true,title:'Console'" style="height:150px;background:#A9FACD;padding:10px;">south region</div>
-	<div data-options="region:'center',title:'Center',
+	<div data-options="region:'center',title:'Model View',
 			onResize:function(){
 		    var canvas = document.getElementById('glcanvas');
-		      canvas.style.width='99.5%';
-          canvas.style.height='99.5%';
+		      canvas.style.width='99.7%';
+          canvas.style.height='99.7%';
           canvas.width  = canvas.offsetWidth;
           canvas.height = canvas.offsetHeight;
 			}">
-	   <canvas id="glcanvas" width = 1280 height =720>
+	   <canvas id="glcanvas" width = 1280 height =720 >
         Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
       </canvas>
-      
+      <!-- Model Data Tree -->
+      <ul class="easyui-tree" style="position:absolute; top:0; left:0;">
+			<li>
+				<span>Enviroment</span>
+				<ul>
+					<li data-options="state:'closed'">
+						<span>Axis</span>
+						<ul>
+							<li>
+								<span>Friend</span>
+							</li>
+							<li>
+								<span>Wife</span>
+							</li>
+							<li>
+								<span>Company</span>
+							</li>
+						</ul>
+					</li>
+					<li  data-options="state:'closed'">
+						<span>Models</span>
+						<ul>
+							<li>Intel</li>
+							<li>Java</li>
+							<li>Microsoft Office</li>
+							<li>Games</li>
+								<li>
+						<span>Program Files</span>
+						<ul>
+							<li>Intel</li>
+							<li>Java</li>
+							<li>Microsoft Office</li>
+							<li>Games</li>
+								<li>
+						<span>Program Files</span>
+						<ul>
+							<li>Intel</li>
+							<li>Java</li>
+								<li>
+						<span>Program Files</span>
+						<ul>
+							<li>Intel</li>
+							<li>Java</li>
+							<li>Microsoft Office</li>
+							<li>Games</li>
+								<li>
+						<span>Program Files</span>
+						<ul>
+							<li>Intel</li>
+							<li>Java</li>
+							<li>Microsoft Office</li>
+							<li>Games</li>
+								<li>
+						<span>Program Files</span>
+						<ul>
+							<li>Intel</li>
+							<li>Java</li>
+							<li>Microsoft Office</li>
+							<li>Games</li>
+						</ul>
+					</li>
+						</ul>
+					</li>
+						</ul>
+					</li>
+							<li>Microsoft Office</li>
+							<li>Games</li>
+						</ul>
+					</li>
+						</ul>
+					</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
 	</div>
   </body>
 </body>

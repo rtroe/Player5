@@ -54,7 +54,8 @@ var reader;
     }
 
     // Read in the image file as a binary string.
-    reader.readAsBinaryString(evt.target.files[0]);
+    //reader.readAsBinaryString(evt.target.files[0]);
+    reader.readAsText(evt.target.files[0], "UTF-16");
   }
 
   document.getElementById('files').addEventListener('change', handleFileSelect, false);
