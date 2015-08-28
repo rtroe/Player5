@@ -14,6 +14,7 @@ var lastCubeUpdateTime = 0;
 var xIncValue = 0.2;
 var yIncValue = -0.4;
 var zIncValue = 0.3;
+var Zoom = -6;
 
 var mvMatrix;
 var shaderProgram;
@@ -44,6 +45,16 @@ function start(elementID) {
       canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
     document.onmousemove = handleMouseMove;
+    
+    //var myimage = document.getElementById(elmntID);
+    if (canvas.addEventListener) {
+	    // IE9, Chrome, Safari, Opera
+	    canvas.addEventListener("mousewheel", MouseWheelHandler, false);
+	    // Firefox
+	    canvas.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
+    }
+    // IE 6/7/8
+    else canvas.attachEvent("onmousewheel", MouseWheelHandler);
 	
     // Initialize the shaders; this is where all the lighting for the
     // vertices and so forth is established.
@@ -293,6 +304,16 @@ function initBuffers() {
     cubeRotationX = 0;
   }
   
+  function MouseWheelHandler(e) {
+
+	// cross-browser wheel delta
+	var e = window.event || e; // old IE support
+	var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+	Zoom -= delta * (Zoom/10);
+
+	return false;
+}
+  
 //
 // drawScene
 //
@@ -302,6 +323,9 @@ function drawScene() {
   // Clear the canvas before we start drawing on it.
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  
+  // Set the viewport to match
+  gl.viewport(0, 0, canvas.width, canvas.height);
   
   // Establish the perspective with which we want to view the
   // scene. Our field of view is 45 degrees, with a width/height
@@ -318,7 +342,7 @@ function drawScene() {
   // Now move the drawing position a bit to where we want to start
   // drawing the cube.
   
-  mvTranslate([-0.0, 0.0, -6.0]);
+  mvTranslate([-0.0, 0.0, Zoom]);
   
   // Save the current matrix, then rotate before we draw.
   
