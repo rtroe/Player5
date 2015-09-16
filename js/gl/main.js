@@ -47,7 +47,7 @@ function start(elementID) {
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
     gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
 	
-      canvas.onmousedown = handleMouseDown;
+    canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
     document.onmousemove = handleMouseMove;
     
@@ -64,26 +64,66 @@ function start(elementID) {
     // Initialize the shaders; this is where all the lighting for the
     // vertices and so forth is established.
     
-    /*
-    var node = $('.JQTreeview').tree('find', 1234);
-
-    $('.JQTreeview').tree('append', {
+  //$('#tt').mousedown(function(e){if(e.button==1)return false;});
+  $('#tt').bind('mousewheel', function(e) {
+    //Get Current Tree Position
+    var x = $('#tt').offset();
+    
+    if(e.originalEvent.wheelDelta / 120 > 0) {
+        $('#tt').offset({top:x.top + 10});
+    } else {
+        $('#tt').offset({top:x.top - 10});
+    }
+});
+$('#mainPane').css("overflow", "hidden");
+  
+  var node = $('#tt').tree('find', 'axis');
+  
+    $('#tt').tree('append', {
             parent: node.target,
              data:[{
-                 id: 1235,
-                 text:'new1'
+                 id: 'xAxis',
+                 text:'X-Axis',
+                 iconCls: 'icon-print',
+                 checked:true
 
          },{
-                 text:'new2',
-                 state:'closed',
-                 children:[{
-                         text:'subnew1'
-                 },{
-                         text:'subnew2'
-                 }]
+                 id: 'yAxis',
+                 text:'Y-Axis',
+                 checked:true
+         },{
+                 id: 'zAxis',
+                 text:'Z-Axis',
+                 checked:true
          }]
     });
-    */
+var rows = [
+	{"name":"Name","value":"Bill Smith","group":"ID Settings","editor":"text"},
+	{"name":"Address","value":"","group":"ID Settings","editor":"text"},
+	{"name":"Age","value":"40","group":"ID Settings","editor":"numberbox"},
+	{"name":"Birthday","value":"01/02/2012","group":"ID Settings","editor":"datebox"},
+	{"name":"SSN","value":"123-456-7890","group":"ID Settings","editor":"text"},
+	{"name":"Email","value":"bill@gmail.com","group":"MarketingSettings","editor":{
+		"type":"validatebox",
+		"options":{"validType":"email"	}
+	}},
+	{"name":"FrequentBuyer","value":"false","group":"Marketing Settings","editor":{
+		"type":"checkbox",
+		"options":{"on":true,"off":false}
+	}}
+
+];
+$("#pg").propertygrid('loadData',rows);
+
+var row = {    
+  name:'AddName',    
+  value:'New Game',    
+  group:'Marketing Settings',    
+  editor:'text'    
+};    
+$('#pg').propertygrid('appendRow',row);  
+
+  //  */
     initShaders();
     
     // Here's where we call the routine that builds all the objects

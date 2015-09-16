@@ -1,5 +1,17 @@
 function io_import_stl(InputFileText)
 {
+    var node = $('#tt').tree('find', 'models');
+      $('#tt').tree('append', {
+            parent: node.target,
+             data:[{
+                 id: numOfElements,
+                 text:'New Solid' + numOfElements,
+                 //iconCls: 'icon-print',
+                 checked:true
+
+         }]
+    });
+    
   /*******************************/
   //First initialise Arrarys
   /*******************************/
@@ -37,7 +49,7 @@ function io_import_stl(InputFileText)
        
        //Add Vertice point
        case "vertex":
-         
+           
          vertices.push(inputLine[1]);
          vertices.push(inputLine[2]);
          vertices.push(inputLine[3]);
@@ -98,5 +110,7 @@ function io_import_stl(InputFileText)
   cubeVerticesIndexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+  
+  $('#modelForm_Open').window('close');
       
 }

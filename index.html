@@ -70,7 +70,7 @@
 MAIN MENU
 *****************************************************
 -->
-	<div data-options="region:'north',border:false," style="height:40px">
+	<div data-options="region:'north',border:false," style="height:70px">
 		<div class="easyui-panel" style="padding:5px;">
 		<a href="#" class="easyui-menubutton" data-options="plain:false,menu:'#mm_main',iconCls:'icon-large-clipart'"></a>
 		<a href="#" class="easyui-menubutton" data-options="plain:true,menu:'#mm_file'">File</a>
@@ -78,7 +78,17 @@ MAIN MENU
 		<a href="#" class="easyui-menubutton" data-options="menu:'#mm_tools'">Tools</a>
 		<a href="#" class="easyui-menubutton" data-options="menu:'#mm2'">Help</a>
 	</div>
-	
+		<div style="padding:2px;;width:500px;">
+    <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-cancel">Cancel</a>
+    <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-reload">Refresh</a>
+    
+    <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-search">Query</a>
+    <a href="#" class="easyui-linkbutton" plain="true">text button</a>
+    <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-print">Print</a>
+    <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-help"></a>
+    <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-save"></a>
+    <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-back"></a>
+</div>
 <!-- MAIN -->
 	<div id="mm_main" style="width:100px; align:right">
 		<div data-options="iconCls:'icon-man', size:'large'" onclick="$('#modelForm_Open').window('open')">Log In</div>
@@ -144,8 +154,9 @@ MAIN MENU
 		<div onclick="$('#modelForm_About').window('open')">About</div>
 	</div>
 </div>
-	
-  <div id="modelForm_Open" class="easyui-window" title="Modal Window" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
+
+
+  <div id="modelForm_Open" class="easyui-window" title="Modal Window" data-options="modal:true,closed:true,iconCls:'icon-save', collapsible:false,minimizable:false, maximizable:false" style="width:500px;height:200px;padding:10px;">
     <input type="file" id="files" name="file" />
       <div id="progress_bar"><div class="percent">0%</div></div>
       <p align="right">
@@ -217,15 +228,11 @@ MAIN MENU
 		<div class="easyui-accordion" data-options="fit:true,border:false ">
 			<div title="Properties" style="padding:0px;">
 						<table id="pg" class="easyui-propertygrid" data-options="
-									url:'http://127.0.0.1:51792/WebGL-Model-View/propertygrid_data1.json',
-				method:'get',	
+				      method:'get',	
 				      showGroup:true,
 				      scrollbarSize:0
 			        ">
           	</table>
-			</div>
-			<div title="Textures" data-options="selected:true" style="padding:10px;">
-					content2
 			</div>
 			<div title="Change Shader" style="padding:10px">
 					content3
@@ -233,8 +240,8 @@ MAIN MENU
 		</div>
 	</div>
 	
-	<div data-options="region:'south', split:true,collapsed:true,title:'Console'" style="height:150px;background:#A9FACD;padding:10px;">south region</div>
-	<div data-options="region:'center',title:'Model View',
+	<div data-options="region:'south', split:true,collapsed:true,title:'Console'" style="height:150px;;padding:10px;">south region</div>
+	<div id="mainPane" data-options="region:'center',title:'Model View',
 			onResize:function(){
 		    var canvas = document.getElementById('glcanvas');
 		      canvas.style.width='99.7%';
@@ -246,32 +253,17 @@ MAIN MENU
         Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
       </canvas>
       <!-- Model Data Tree -->
-      <ul class="easyui-tree" style="position:absolute; top:0; left:0;">
+      <ul id="tt" class="easyui-tree" style="position:absolute; top:0; left:0;" data-options="checkbox:true">
 			<li>
 				<span>Enviroment</span>
 				<ul>
-					<li data-options="state:'closed'">
+					<li id="axis"  data-options="state:'closed'">
 						<span>Axis</span>
-						<ul>
-							<li>
-								<span>Friend</span>
-							</li>
-							<li>
-								<span>Wife</span>
-							</li>
-							<li>
-								<span>Company</span>
-							</li>
-						</ul>
+						
 					</li>
-					<li  data-options="state:'closed'">
+					<li id="models"  data-options="state:'closed'">
 						<span>Models</span>
-						<ul>
-							<li>Intel</li>
-							<li>Java</li>
-							<li>Microsoft Office</li>
-							<li>Games</li>
-						</ul>
+
 					</li>
 						</ul>
 			</li>
