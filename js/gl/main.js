@@ -64,6 +64,26 @@ function start(elementID) {
     // Initialize the shaders; this is where all the lighting for the
     // vertices and so forth is established.
     
+    /*
+    var node = $('.JQTreeview').tree('find', 1234);
+
+    $('.JQTreeview').tree('append', {
+            parent: node.target,
+             data:[{
+                 id: 1235,
+                 text:'new1'
+
+         },{
+                 text:'new2',
+                 state:'closed',
+                 children:[{
+                         text:'subnew1'
+                 },{
+                         text:'subnew2'
+                 }]
+         }]
+    });
+    */
     initShaders();
     
     // Here's where we call the routine that builds all the objects
