@@ -3,6 +3,8 @@ var gl;
 
 var modelprop_Center=[0,0,0];
 
+var modelprop_Radius=10;
+
 var cubeVerticesBuffer;
 var cubeVerticesColorBuffer;
 var cubeVerticesIndexBuffer;
@@ -352,6 +354,7 @@ function drawScene() {
   mvRotate(cubeRotationY, [1, 0, 0]);
   mvRotate(cubeRotationX, [0, 1, 0]);
   
+  //Next Center the scene around the model
   mvTranslate(modelprop_Center);
   
   
@@ -375,6 +378,8 @@ function drawScene() {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
   setMatrixUniforms();
   gl.drawElements(gl.TRIANGLES, numOfElements, gl.UNSIGNED_SHORT, 0);
+  
+  //gl.drawElements(gl.LINE_STRIP, numOfElements, gl.UNSIGNED_SHORT, 0);
   
   // Restore the original matrix
   

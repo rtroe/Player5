@@ -10,10 +10,15 @@ function io_import_stl(InputFileText)
   
   var temp_Normal = [];        //To hold the Normal for that entire face.
   
-  var temp_colour = [ 0.5, 0.5, 0.5, 1];        //Holds the Current Model Colour
+  var temp_colour = [ 0.75, 0.5, 0.05, 1];        //Holds the Current Model Colour
   
   //Zero out the number of elements
   numOfElements = 0;
+  
+  //Re-zero out the model center
+  modelprop_Center[0] = 0;
+  modelprop_Center[1] = 0;
+  modelprop_Center[2] = 0;
   
       // Print out Result line By Line
     var lines = InputFileText.split('\n');
@@ -25,31 +30,25 @@ function io_import_stl(InputFileText)
      
      switch (inputLine[0])
      {
+       //Add Normal
        case "facet":
          temp_Normal = [inputLine[2], inputLine[3], inputLine[4]];
-         
-         
-         vertexNormals.push(temp_Normal[0]);
-         vertexNormals.push(temp_Normal[1]);
-         vertexNormals.push(temp_Normal[2]);
-         
-         
-         vertexNormals.push(temp_Normal[0]);
-         vertexNormals.push(temp_Normal[1]);
-         vertexNormals.push(temp_Normal[2]);
-         
-         
-         vertexNormals.push(temp_Normal[0]);
-         vertexNormals.push(temp_Normal[1]);
-         vertexNormals.push(temp_Normal[2]);
-         console.log(temp_Normal);
        break;
        
+       //Add Vertice point
        case "vertex":
          
          vertices.push(inputLine[1]);
          vertices.push(inputLine[2]);
          vertices.push(inputLine[3]);
+         
+         modelprop_Center[0] -= inputLine[1];
+         modelprop_Center[1] -= inputLine[2];
+         modelprop_Center[2] -= inputLine[3];
+         
+         vertexNormals.push(temp_Normal[0]);
+         vertexNormals.push(temp_Normal[1]);
+         vertexNormals.push(temp_Normal[2]);
          
          generatedColors.push(temp_colour[0]);
          generatedColors.push(temp_colour[1]);
@@ -60,11 +59,16 @@ function io_import_stl(InputFileText)
          
          //First Increment number of elements
           numOfElements++;
-          console.log(numOfElements);
+          //console.log(numOfElements);
        break;
      }
     }
-    console.log(cubeVertexIndices);
+    //console.log(cubeVertexIndices);
+    
+    modelprop_Center[0] /= numOfElements;
+    modelprop_Center[1] /= numOfElements;
+    modelprop_Center[2] /= numOfElements;
+         
     //Now that all of the data has been written in, 
   // Create a buffer for the cube's vertices.
   cubeVerticesBuffer = gl.createBuffer();

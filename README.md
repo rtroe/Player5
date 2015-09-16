@@ -11,5 +11,10 @@ A working release isn't available yet, although if you'd like to try the current
 3. If it’s not already, Enable developer mode
 4. Click “Load unpacked extension…” and select the folder where you cloned the repo
 
+
+# Features
+  - Open ASCII stl Files
+
 # Roadmap
-  - Open stl, obj, and 3ds files
+  - Open Binary stl, obj, and 3ds files
+  - Add Import/Export Capability
