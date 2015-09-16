@@ -10,7 +10,7 @@ var reader;
   
   //Returns the File extension
 function getFileExtention(fileName){
-  return fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length)
+  return fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length);
 }
 
   function abortRead() {
@@ -29,7 +29,7 @@ function getFileExtention(fileName){
         break; // noop
       default:
         alert('An error occurred reading this file.');
-    };
+    }
   }
   
   function updateProgress(evt) {

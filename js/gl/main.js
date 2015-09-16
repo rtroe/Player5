@@ -1,10 +1,13 @@
 var canvas;
 var gl;
 
+var modelprop_Center=[0,0,0];
+
 var cubeVerticesBuffer;
 var cubeVerticesColorBuffer;
 var cubeVerticesIndexBuffer;
 var cubeVerticesIndexBuffer;
+var numOfElements = 0;
 var cubeRotationX = 0.0;
 var cubeRotationY = 0.0;
 var cubeXOffset = 0.0;
@@ -79,7 +82,7 @@ function loadTeapot() {
       if (request.readyState == 4) {
         alert(request.responseText);
       }
-    }
+    };
     request.send();
   }
   
@@ -113,18 +116,17 @@ function initWebGL() {
 //
 function initBuffers() {
   
+  numOfElements = 36;
   // Create a buffer for the cube's vertices.
-  
   cubeVerticesBuffer = gl.createBuffer();
   
   // Select the cubeVerticesBuffer as the one to apply vertex
   // operations to from here out.
-  
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
   
   // Now create an array of vertices for the cube.
-  
   var vertices = [
+    
     // Front face
     -1.0, -1.0,  1.0,
      1.0, -1.0,  1.0,
@@ -261,7 +263,7 @@ function initBuffers() {
     12, 13, 14,     12, 14, 15,   // bottom
     16, 17, 18,     16, 18, 19,   // right
     20, 21, 22,     20, 22, 23    // left
-  ]
+  ];
   
   // Now send the element array to GL
   
@@ -332,7 +334,7 @@ function drawScene() {
   // ratio of 640:480, and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
   
-  perspectiveMatrix = makePerspective(45, canvas.width/canvas.height, 0.1, 100.0);
+  perspectiveMatrix = makePerspective(45, canvas.width/canvas.height, 0.1, 10000.0);
   
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
@@ -350,31 +352,29 @@ function drawScene() {
   mvRotate(cubeRotationY, [1, 0, 0]);
   mvRotate(cubeRotationX, [0, 1, 0]);
   
+  mvTranslate(modelprop_Center);
+  
   
   // Draw the cube by binding the array buffer to the cube's vertices
   // array, setting attributes, and pushing it to GL.
-  
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
   gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
   
   
     // Bind the normals buffer to the shader attribute.
-  
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
   gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
   
   
   // Set the colors attribute for the vertices.
-  
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColorBuffer);
   gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
   
   
   // Draw the cube.
-  
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
   setMatrixUniforms();
-  gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+  gl.drawElements(gl.TRIANGLES, numOfElements, gl.UNSIGNED_SHORT, 0);
   
   // Restore the original matrix
   
