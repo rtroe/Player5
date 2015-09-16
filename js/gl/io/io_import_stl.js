@@ -1,12 +1,13 @@
-function io_import_stl(InputFileText)
+function io_import_stl(FileName, InputFileText)
 {
+  log("Loading file <b>'"+FileName+"'</b> as an <b>'ascii .stl'</b> file...");
     var node = $('#tt').tree('find', 'models');
       $('#tt').tree('append', {
             parent: node.target,
              data:[{
-                 id: numOfElements,
-                 text:'New Solid' + numOfElements,
-                 //iconCls: 'icon-print',
+                 id: FileName,
+                 text: FileName,
+                 iconCls: 'icon-large-picture',
                  checked:true
 
          }]
@@ -26,6 +27,8 @@ function io_import_stl(InputFileText)
   
   //Zero out the number of elements
   numOfElements = 0;
+  
+  var treeItems = [];
   
   //Re-zero out the model center
   modelprop_Center[0] = 0;
@@ -68,6 +71,13 @@ function io_import_stl(InputFileText)
          generatedColors.push(temp_colour[3]);
          
          cubeVertexIndices.push(numOfElements);
+         /*
+         var dataThisLoop = {
+          id: numOfElements,
+          text:'New Solid' + numOfElements
+         };
+         treeItems.push(dataThisLoop);
+         */
          
          //First Increment number of elements
           numOfElements++;
@@ -76,7 +86,13 @@ function io_import_stl(InputFileText)
      }
     }
     //console.log(cubeVertexIndices);
-    
+    /*
+    var node2 = $('#tt').tree('find', FileName);
+          $('#tt').tree('append', {
+            parent: node2.target,
+             data:treeItems
+    });
+    */
     modelprop_Center[0] /= numOfElements;
     modelprop_Center[1] /= numOfElements;
     modelprop_Center[2] /= numOfElements;
@@ -112,5 +128,5 @@ function io_import_stl(InputFileText)
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
   
   $('#modelForm_Open').window('close');
-      
+  log("Done!");
 }

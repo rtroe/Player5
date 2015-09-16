@@ -37,6 +37,7 @@ function start(elementID) {
   elmntID = elementID;
   canvas = document.getElementById(elmntID);
 
+  log("Initializing WebGL");
   initWebGL(canvas);      // Initialize the GL context
   
   // Only continue if WebGL is available and working
@@ -51,6 +52,8 @@ function start(elementID) {
     document.onmouseup = handleMouseUp;
     document.onmousemove = handleMouseMove;
     
+    
+  log("Setting Up Event Listerners");
     //var myimage = document.getElementById(elmntID);
     if (canvas.addEventListener) {
 	    // IE9, Chrome, Safari, Opera
@@ -64,71 +67,13 @@ function start(elementID) {
     // Initialize the shaders; this is where all the lighting for the
     // vertices and so forth is established.
     
-  //$('#tt').mousedown(function(e){if(e.button==1)return false;});
-  $('#tt').bind('mousewheel', function(e) {
-    //Get Current Tree Position
-    var x = $('#tt').offset();
-    
-    if(e.originalEvent.wheelDelta / 120 > 0) {
-        $('#tt').offset({top:x.top + 10});
-    } else {
-        $('#tt').offset({top:x.top - 10});
-    }
-});
-$('#mainPane').css("overflow", "hidden");
-  
-  var node = $('#tt').tree('find', 'axis');
-  
-    $('#tt').tree('append', {
-            parent: node.target,
-             data:[{
-                 id: 'xAxis',
-                 text:'X-Axis',
-                 iconCls: 'icon-print',
-                 checked:true
-
-         },{
-                 id: 'yAxis',
-                 text:'Y-Axis',
-                 checked:true
-         },{
-                 id: 'zAxis',
-                 text:'Z-Axis',
-                 checked:true
-         }]
-    });
-var rows = [
-	{"name":"Name","value":"Bill Smith","group":"ID Settings","editor":"text"},
-	{"name":"Address","value":"","group":"ID Settings","editor":"text"},
-	{"name":"Age","value":"40","group":"ID Settings","editor":"numberbox"},
-	{"name":"Birthday","value":"01/02/2012","group":"ID Settings","editor":"datebox"},
-	{"name":"SSN","value":"123-456-7890","group":"ID Settings","editor":"text"},
-	{"name":"Email","value":"bill@gmail.com","group":"MarketingSettings","editor":{
-		"type":"validatebox",
-		"options":{"validType":"email"	}
-	}},
-	{"name":"FrequentBuyer","value":"false","group":"Marketing Settings","editor":{
-		"type":"checkbox",
-		"options":{"on":true,"off":false}
-	}}
-
-];
-$("#pg").propertygrid('loadData',rows);
-
-var row = {    
-  name:'AddName',    
-  value:'New Game',    
-  group:'Marketing Settings',    
-  editor:'text'    
-};    
-$('#pg').propertygrid('appendRow',row);  
-
-  //  */
+  log("Initializing Shaders");
     initShaders();
     
     // Here's where we call the routine that builds all the objects
     // we'll be drawing.
     
+  log("Initializing Buffers");
     initBuffers();
 	
     // Set up to draw the scene periodically.
@@ -347,6 +292,7 @@ function initBuffers() {
 
   function handleMouseUp(event) {
     mouseDown = false;
+    //log("set Rotation ("+ cubeRotationX + ", "+ cubeRotationY+")");
   }
 
   function handleMouseMove(event) {
@@ -374,7 +320,7 @@ function initBuffers() {
 	var e = window.event || e; // old IE support
 	var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 	Zoom -= delta * (Zoom/10);
-
+  //log("Set Zoom: " + Zoom);
 	return false;
 }
   
@@ -417,7 +363,6 @@ function drawScene() {
   //Next Center the scene around the model
   mvTranslate(modelprop_Center);
   
-  
   // Draw the cube by binding the array buffer to the cube's vertices
   // array, setting attributes, and pushing it to GL.
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
@@ -438,7 +383,7 @@ function drawScene() {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
   setMatrixUniforms();
   gl.drawElements(gl.TRIANGLES, numOfElements, gl.UNSIGNED_SHORT, 0);
-  
+  //gl.lineWidth(5);
   //gl.drawElements(gl.LINE_STRIP, numOfElements, gl.UNSIGNED_SHORT, 0);
   
   // Restore the original matrix

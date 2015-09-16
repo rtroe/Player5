@@ -1,9 +1,11 @@
 var reader;
-  var progress = document.querySelector('.percent');
+var progress = document.querySelector('.percent');
   
-  var fileExtention;
+var fileExtention;
   
-  var EnumFileType = {
+var fileName;
+
+var EnumFileType = {
     STL : 0,
     ThreeDS : 1
   };
@@ -50,6 +52,7 @@ function getFileExtention(fileName){
     
      //First Find Which File Type it is.
       var fileExtention = getFileExtention(evt.target.files[0].name).toLowerCase();
+    fileName = evt.target.files[0].name;
     
     // Reset progress indicator on new file selection.
     progress.style.width = '0%';
@@ -75,14 +78,14 @@ function getFileExtention(fileName){
     //Function Executed After the File Has Been Loaded
     reader.onload = function(e) {
       
-     
       switch(fileExtention)
       {
         case "stl":
-          io_import_stl(this.result);
+          io_import_stl(fileName, this.result);
           break;
         default:
         alert("File Type .'" + fileExtention + "' Not Supported.\nIf you would like this file type added, please contact us!");
+        log("File Type .'" + fileExtention + "' Not Supported.\nIf you would like this file type added, please contact us!");
         break;
       }
       

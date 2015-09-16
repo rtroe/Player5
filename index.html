@@ -176,15 +176,8 @@ MAIN MENU
   texture types.
   </p>
   </div>
-  
       <div id="modelForm_Help" class="easyui-window" title="About : Vertices Viewer v. 0.1" data-options="modal:true,closed:true,iconCls:'icon-man'" style="width:500px;height:200px;padding:10px;">
-
   </div>
-  
-  
-  
-  
-  
 	
 	<div data-options="region:'west',split:true,title:'West' ,collapsed:true" style="width:200px;">
 	  	<div class="easyui-panel" style="padding:5px">
@@ -240,7 +233,9 @@ MAIN MENU
 		</div>
 	</div>
 	
-	<div data-options="region:'south', split:true,collapsed:true,title:'Console'" style="height:150px;;padding:10px;">south region</div>
+	<div id="sonsoleDiv" data-options="region:'south', split:true,collapsed:false,title:'Console'" style="height:150px;;padding:2px;">
+	  <div id="console"></div>
+	</div>
 	<div id="mainPane" data-options="region:'center',title:'Model View',
 			onResize:function(){
 		    var canvas = document.getElementById('glcanvas');
@@ -257,11 +252,11 @@ MAIN MENU
 			<li>
 				<span>Enviroment</span>
 				<ul>
-					<li id="axis"  data-options="state:'closed'">
+					<li id="axis"  data-options="state:'opened'">
 						<span>Axis</span>
 						
 					</li>
-					<li id="models"  data-options="state:'closed'">
+					<li id="models"  data-options="state:'opened'">
 						<span>Models</span>
 
 					</li>
