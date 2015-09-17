@@ -5,10 +5,16 @@ var modelprop_Center=[0,0,0];
 
 var modelprop_Radius=10;
 
+//Grid Variables
+var gridVerticesBuffer;
+var gridVerticesColorBuffer;
+var gridVerticesIndexBuffer;
+
 var cubeVerticesBuffer;
 var cubeVerticesColorBuffer;
 var cubeVerticesIndexBuffer;
-var cubeVerticesIndexBuffer;
+
+//var cubeVerticesIndexBuffer;
 var numOfElements = 0;
 var cubeRotationX = 0.0;
 var cubeRotationY = 0.0;
@@ -79,12 +85,16 @@ function start(elementID) {
     // Set up to draw the scene periodically.
     
     setInterval(drawScene, 15);
+    
+    //loadTeapot();
+    initTextures();
   }
 }
 
 function loadTeapot() {
     var request = new XMLHttpRequest();
-    request.open("GET", "cubetexture.png");
+    //request.open("GET", "images/cubetexture.png");
+    request.open("GET", "images/test.txt");
     request.onreadystatechange = function() {
       if (request.readyState == 4) {
         alert(request.responseText);
@@ -93,6 +103,22 @@ function loadTeapot() {
     request.send();
   }
   
+  function initTextures() {
+  cubeTexture = gl.createTexture();
+  cubeImage = new Image();
+  cubeImage.onload = function() { handleTextureLoaded(cubeImage, cubeTexture); }
+  cubeImage.src = "images/cubetexture.png";
+}
+
+function handleTextureLoaded(image, texture) {
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.bindTexture(gl.TEXTURE_2D, null);
+}
+
 //
 // initWebGL
 //
@@ -121,161 +147,115 @@ function initWebGL() {
 // Initialize the buffers we'll need. For this demo, we just have
 // one object -- a simple two-dimensional cube.
 //
+  var numOfGridLines = 0;
 function initBuffers() {
   
-  numOfElements = 36;
-  // Create a buffer for the cube's vertices.
-  cubeVerticesBuffer = gl.createBuffer();
+  var gridSize = 100;
+
+  var gridVertices = [];
+  var gridNormals = [];
+  var gridColours = [];
+  var gridIndices = [];
   
-  // Select the cubeVerticesBuffer as the one to apply vertex
-  // operations to from here out.
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-  
-  // Now create an array of vertices for the cube.
-  var vertices = [
-    
-    // Front face
-    -1.0, -1.0,  1.0,
-     1.0, -1.0,  1.0,
-     1.0,  1.0,  1.0,
-    -1.0,  1.0,  1.0,
-    
-    // Back face
-    -1.0, -1.0, -1.0,
-    -1.0,  1.0, -1.0,
-     1.0,  1.0, -1.0,
-     1.0, -1.0, -1.0,
-    
-    // Top face
-    -1.0,  1.0, -1.0,
-    -1.0,  1.0,  1.0,
-     1.0,  1.0,  1.0,
-     1.0,  1.0, -1.0,
-    
-    // Bottom face
-    -1.0, -1.0, -1.0,
-     1.0, -1.0, -1.0,
-     1.0, -1.0,  1.0,
-    -1.0, -1.0,  1.0,
-    
-    // Right face
-     1.0, -1.0, -1.0,
-     1.0,  1.0, -1.0,
-     1.0,  1.0,  1.0,
-     1.0, -1.0,  1.0,
-    
-    // Left face
-    -1.0, -1.0, -1.0,
-    -1.0, -1.0,  1.0,
-    -1.0,  1.0,  1.0,
-    -1.0,  1.0, -1.0
-  ];
-  
-  // Now pass the list of vertices into WebGL to build the shape. We
-  // do this by creating a Float32Array from the JavaScript array,
-  // then use it to fill the current vertex buffer.
-  
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  
-   // Set up the normals for the vertices, so that we can compute lighting.
-  
-  cubeVerticesNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
-  
-  var vertexNormals = [
-    // Front
-     0.0,  0.0,  1.0,
-     0.0,  0.0,  1.0,
-     0.0,  0.0,  1.0,
-     0.0,  0.0,  1.0,
-    
-    // Back
-     0.0,  0.0, -1.0,
-     0.0,  0.0, -1.0,
-     0.0,  0.0, -1.0,
-     0.0,  0.0, -1.0,
-    
-    // Top
-     0.0,  1.0,  0.0,
-     0.0,  1.0,  0.0,
-     0.0,  1.0,  0.0,
-     0.0,  1.0,  0.0,
-    
-    // Bottom
-     0.0, -1.0,  0.0,
-     0.0, -1.0,  0.0,
-     0.0, -1.0,  0.0,
-     0.0, -1.0,  0.0,
-    
-    // Right
-     1.0,  0.0,  0.0,
-     1.0,  0.0,  0.0,
-     1.0,  0.0,  0.0,
-     1.0,  0.0,  0.0,
-    
-    // Left
-    -1.0,  0.0,  0.0,
-    -1.0,  0.0,  0.0,
-    -1.0,  0.0,  0.0,
-    -1.0,  0.0,  0.0
-  ];
-  
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals),
-                gl.STATIC_DRAW);
-  
-  // Now set up the colors for the faces. We'll use solid colors
-  // for each face.
-  
-  var colors = [
-    [1.0,  1.0,  1.0,  1.0],    // Front face: white
-    [1.0,  0.0,  0.0,  1.0],    // Back face: red
-    [0.0,  1.0,  0.0,  1.0],    // Top face: green
-    [0.0,  0.0,  1.0,  1.0],    // Bottom face: blue
-    [1.0,  1.0,  0.0,  1.0],    // Right face: yellow
-    [1.0,  0.0,  1.0,  1.0]     // Left face: purple
-  ];
-  
-  // Convert the array of colors into a table for all the vertices.
-  
-  var generatedColors = [];
-  
-  for (j=0; j<6; j++) {
-    var c = colors[j];
-    
-    // Repeat each color four times for the four vertices of the face
-    
-    for (var i=0; i<4; i++) {
-      generatedColors = generatedColors.concat(c);
-    }
+  numOfElements = 0;
+  var temp_Normal = [0,0,0];
+  //var temp_colour = [ 0.25, 0.25, 0.25, 1];  
+  var temp_colour = [ 0.825, 0.825, 0.825, 1];     
+  var count = 0;
+  /* Load In Vertex and Colour Data */
+  for(var i = -gridSize; i < gridSize+1; i+=10)
+  {
+    // First Point is (i, 0, -gridSize)
+         gridVertices.push(i);
+         gridVertices.push(0);
+         gridVertices.push(-gridSize); 
+         
+         gridNormals.push(temp_Normal[0]);
+         gridNormals.push(temp_Normal[1]);
+         gridNormals.push(temp_Normal[2]);
+         
+         gridColours.push(temp_colour[0]);
+         gridColours.push(temp_colour[1]);
+         gridColours.push(temp_colour[2]);
+         gridColours.push(temp_colour[3]);
+         
+         gridIndices.push(count);
+         count++;
+         
+        gridVertices.push(i);
+         gridVertices.push(0);
+         gridVertices.push(gridSize);
+         
+         gridNormals.push(temp_Normal[0]);
+         gridNormals.push(temp_Normal[1]);
+         gridNormals.push(temp_Normal[2]);
+         
+         gridColours.push(temp_colour[0]);
+         gridColours.push(temp_colour[1]);
+         gridColours.push(temp_colour[2]);
+         gridColours.push(temp_colour[3]);
+         
+         gridIndices.push(count);
+         count++;
+         
+         gridVertices.push(-gridSize);
+         gridVertices.push(0);
+         gridVertices.push(i);
+         
+         gridNormals.push(temp_Normal[0]);
+         gridNormals.push(temp_Normal[1]);
+         gridNormals.push(temp_Normal[2]);
+         
+         gridColours.push(temp_colour[0]);
+         gridColours.push(temp_colour[1]);
+         gridColours.push(temp_colour[2]);
+         gridColours.push(temp_colour[3]);
+         
+         gridIndices.push(count);
+         count++;
+         
+        gridVertices.push(gridSize);
+         gridVertices.push(0);
+         gridVertices.push(i);
+         
+         gridNormals.push(temp_Normal[0]);
+         gridNormals.push(temp_Normal[1]);
+         gridNormals.push(temp_Normal[2]);
+         
+         gridColours.push(temp_colour[0]);
+         gridColours.push(temp_colour[1]);
+         gridColours.push(temp_colour[2]);
+         gridColours.push(temp_colour[3]);
+         
+         gridIndices.push(count);
+         count++;
+         
+  //console.log(i);
   }
+  numOfGridLines = count-1;
+  // Create a buffer for the cube's vertices.
+  gridVerticesBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, gridVerticesBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gridVertices), gl.STATIC_DRAW);
   
-  cubeVerticesColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(generatedColors), gl.STATIC_DRAW);
+    // Set up the normals for the vertices, so that we can compute lighting.
+  gridNormalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, gridNormalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gridNormals), gl.STATIC_DRAW);
+  
+  // Now set up the colors
+  gridVerticesColorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, gridVerticesColorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gridColours), gl.STATIC_DRAW);
+
 
   // Build the element array buffer; this specifies the indices
   // into the vertex array for each face's vertices.
+  gridVerticesIndexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gridVerticesIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gridIndices), gl.STATIC_DRAW);
   
-  cubeVerticesIndexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
-  
-  // This array defines each face as two triangles, using the
-  // indices into the vertex array to specify each triangle's
-  // position.
-  
-  var cubeVertexIndices = [
-    0,  1,  2,      0,  2,  3,    // front
-    4,  5,  6,      4,  6,  7,    // back
-    8,  9,  10,     8,  10, 11,   // top
-    12, 13, 14,     12, 14, 15,   // bottom
-    16, 17, 18,     16, 18, 19,   // right
-    20, 21, 22,     20, 22, 23    // left
-  ];
-  
-  // Now send the element array to GL
-  
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
-      new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+  //console.log(numOfGridLines);
 }
 
 
@@ -323,6 +303,32 @@ function initBuffers() {
   //log("Set Zoom: " + Zoom);
 	return false;
 }
+
+function drawGrid() {
+  // Clear the canvas before we start drawing on it.
+
+  // Draw the cube by binding the array buffer to the cube's vertices
+  // array, setting attributes, and pushing it to GL.
+  gl.bindBuffer(gl.ARRAY_BUFFER, gridVerticesBuffer);
+  gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+    // Bind the normals buffer to the shader attribute.
+  gl.bindBuffer(gl.ARRAY_BUFFER, gridNormalBuffer);
+  gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+  
+  // Set the colors attribute for the vertices.
+  gl.bindBuffer(gl.ARRAY_BUFFER, gridVerticesColorBuffer);
+  gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+  
+  // Draw the cube.
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gridVerticesIndexBuffer);
+  
+  setMatrixUniforms();
+  //gl.drawElements(gl.TRIANGLES, numOfElements, gl.UNSIGNED_SHORT, 0);
+  //gl.lineWidth(2);
+  gl.drawElements(gl.LINES, numOfGridLines, gl.UNSIGNED_SHORT, 0);
+  
+}
   
 //
 // drawScene
@@ -363,6 +369,10 @@ function drawScene() {
   //Next Center the scene around the model
   mvTranslate(modelprop_Center);
   
+  drawGrid();
+  
+  if(numOfElements> 0)
+  {
   // Draw the cube by binding the array buffer to the cube's vertices
   // array, setting attributes, and pushing it to GL.
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
@@ -387,7 +397,7 @@ function drawScene() {
   //gl.drawElements(gl.LINE_STRIP, numOfElements, gl.UNSIGNED_SHORT, 0);
   
   // Restore the original matrix
-  
+  }
   mvPopMatrix();
   
   // Update the rotation for the next draw, if it's time to do so.

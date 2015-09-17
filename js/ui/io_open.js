@@ -7,7 +7,7 @@ var fileName;
 
 var EnumFileType = {
     STL : 0,
-    ThreeDS : 1
+    OBJ : 1
   };
   
   //Returns the File extension
@@ -80,6 +80,9 @@ function getFileExtention(fileName){
       
       switch(fileExtention)
       {
+        case "obj":
+          io_import_obj(fileName, this.result);
+          break;
         case "stl":
           io_import_stl(fileName, this.result);
           break;
