@@ -63,6 +63,18 @@ function io_import_obj(FileName, InputFileText)
         temp_Normals.push(inputLine[2]);
         temp_Normals.push(inputLine[3]);
        break;
+       
+       
+       //Add group
+       case 'o':
+       case 'g':
+          var dataThisLoop = {
+          id: numOfElements,
+          text:'Group: ' + inputLine[1]
+         };
+         treeItems.push(dataThisLoop);
+         
+         break;
        /*
        //Add Face
        case 'f':
@@ -158,7 +170,7 @@ function io_import_obj(FileName, InputFileText)
             temp_Normal[0] = temp_Normals[(indexArray[2]-1)*3];
             temp_Normal[1] = temp_Normals[(indexArray[2]-1)*3+1];
             temp_Normal[2] = temp_Normals[(indexArray[2]-1)*3+2];
-            console.log((indexArray[2]-1));
+            //console.log((indexArray[2]-1));
           }
 
           //Add In Normals
@@ -180,6 +192,12 @@ function io_import_obj(FileName, InputFileText)
          break;
      }
     }
+    
+         var node2 = $('#tt').tree('find', FileName);
+          $('#tt').tree('append', {
+            parent: node2.target,
+             data:treeItems
+    });
     
     //Set Model Center
     modelprop_Center[0] /= numOfElements;
