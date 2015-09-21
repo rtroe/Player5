@@ -84,7 +84,7 @@ function io_import_obj(FileName, InputFileText)
         NewMesh.Name = 'Group: ' + inputLine[1];
          
           var dataThisLoop = {
-          id: numOfElements,
+          id: 'Group: ' + inputLine[1],
           text:'Group: ' + inputLine[1],
           checked:true
          };
@@ -139,7 +139,6 @@ function io_import_obj(FileName, InputFileText)
           
           //Add in Element Indice
           NewMesh.Indices.push(NewMesh.Indices.length);
-          //numOfElements++;
           }
         }
          break;
@@ -156,8 +155,10 @@ function io_import_obj(FileName, InputFileText)
               //New elegent Drawing code
   for(var i = 0; i < MeshCollection.length; i++)
   {
-    if(MeshCollection[i].Name == node.text)
+    if(MeshCollection[i].Name == node.text){
         MeshCollection[i].Enabled = !node.checked;
+     console.log(node);
+    }
   }
                 }
             });
