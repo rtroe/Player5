@@ -5,26 +5,24 @@ var modelprop_Center=[0,0,0];
 
 var modelprop_Radius=10;
 
-//Grid Variables
-var gridVerticesBuffer;
-var gridVerticesColorBuffer;
-var gridVerticesIndexBuffer;
-
 var cubeVerticesBuffer;
 var cubeVerticesColorBuffer;
 var cubeVerticesIndexBuffer;
+
+
+//This is a collection of all of the current meshes
+var MeshCollection = [];
+
+//Grid Variables
+var GridMesh = new Mesh();
 
 //var cubeVerticesIndexBuffer;
 var numOfElements = 0;
 var cubeRotationX = 0.0;
 var cubeRotationY = 0.0;
-var cubeXOffset = 0.0;
-var cubeYOffset = 0.0;
-var cubeZOffset = 0.0;
+
 var lastCubeUpdateTime = 0;
-var xIncValue = 0.2;
-var yIncValue = -0.4;
-var zIncValue = 0.3;
+
 var Zoom = -6;
 
 var mvMatrix;
@@ -85,9 +83,6 @@ function start(elementID) {
     // Set up to draw the scene periodically.
     
     setInterval(drawScene, 15);
-    
-    //loadTeapot();
-    initTextures();
   }
 }
 
@@ -147,16 +142,10 @@ function initWebGL() {
 // Initialize the buffers we'll need. For this demo, we just have
 // one object -- a simple two-dimensional cube.
 //
-  var numOfGridLines = 0;
 function initBuffers() {
   
   var gridSize = 100;
 
-  var gridVertices = [];
-  var gridNormals = [];
-  var gridColours = [];
-  var gridIndices = [];
-  
   numOfElements = 0;
   var temp_Normal = [0,0,0];
   //var temp_colour = [ 0.25, 0.25, 0.25, 1];  
@@ -166,96 +155,81 @@ function initBuffers() {
   for(var i = -gridSize; i < gridSize+1; i+=10)
   {
     // First Point is (i, 0, -gridSize)
-         gridVertices.push(i);
-         gridVertices.push(0);
-         gridVertices.push(-gridSize); 
+         GridMesh.vertices.push(i);
+         GridMesh.vertices.push(0);
+         GridMesh.vertices.push(-gridSize); 
          
-         gridNormals.push(temp_Normal[0]);
-         gridNormals.push(temp_Normal[1]);
-         gridNormals.push(temp_Normal[2]);
+         GridMesh.vert_noramls.push(temp_Normal[0]);
+         GridMesh.vert_noramls.push(temp_Normal[1]);
+         GridMesh.vert_noramls.push(temp_Normal[2]);
          
-         gridColours.push(temp_colour[0]);
-         gridColours.push(temp_colour[1]);
-         gridColours.push(temp_colour[2]);
-         gridColours.push(temp_colour[3]);
+         GridMesh.vert_colours.push(temp_colour[0]);
+         GridMesh.vert_colours.push(temp_colour[1]);
+         GridMesh.vert_colours.push(temp_colour[2]);
+         GridMesh.vert_colours.push(temp_colour[3]);
          
-         gridIndices.push(count);
+         GridMesh.Indices.push(count);
          count++;
          
-        gridVertices.push(i);
-         gridVertices.push(0);
-         gridVertices.push(gridSize);
          
-         gridNormals.push(temp_Normal[0]);
-         gridNormals.push(temp_Normal[1]);
-         gridNormals.push(temp_Normal[2]);
          
-         gridColours.push(temp_colour[0]);
-         gridColours.push(temp_colour[1]);
-         gridColours.push(temp_colour[2]);
-         gridColours.push(temp_colour[3]);
          
-         gridIndices.push(count);
+         GridMesh.vertices.push(i);
+         GridMesh.vertices.push(0);
+         GridMesh.vertices.push(gridSize); 
+         
+         GridMesh.vert_noramls.push(temp_Normal[0]);
+         GridMesh.vert_noramls.push(temp_Normal[1]);
+         GridMesh.vert_noramls.push(temp_Normal[2]);
+         
+         GridMesh.vert_colours.push(temp_colour[0]);
+         GridMesh.vert_colours.push(temp_colour[1]);
+         GridMesh.vert_colours.push(temp_colour[2]);
+         GridMesh.vert_colours.push(temp_colour[3]);
+         
+         GridMesh.Indices.push(count);
          count++;
          
-         gridVertices.push(-gridSize);
-         gridVertices.push(0);
-         gridVertices.push(i);
          
-         gridNormals.push(temp_Normal[0]);
-         gridNormals.push(temp_Normal[1]);
-         gridNormals.push(temp_Normal[2]);
          
-         gridColours.push(temp_colour[0]);
-         gridColours.push(temp_colour[1]);
-         gridColours.push(temp_colour[2]);
-         gridColours.push(temp_colour[3]);
          
-         gridIndices.push(count);
+         GridMesh.vertices.push(-gridSize); 
+         GridMesh.vertices.push(0);
+         GridMesh.vertices.push(i);
+         
+         GridMesh.vert_noramls.push(temp_Normal[0]);
+         GridMesh.vert_noramls.push(temp_Normal[1]);
+         GridMesh.vert_noramls.push(temp_Normal[2]);
+         
+         GridMesh.vert_colours.push(temp_colour[0]);
+         GridMesh.vert_colours.push(temp_colour[1]);
+         GridMesh.vert_colours.push(temp_colour[2]);
+         GridMesh.vert_colours.push(temp_colour[3]);
+         
+         GridMesh.Indices.push(count);
          count++;
          
-        gridVertices.push(gridSize);
-         gridVertices.push(0);
-         gridVertices.push(i);
          
-         gridNormals.push(temp_Normal[0]);
-         gridNormals.push(temp_Normal[1]);
-         gridNormals.push(temp_Normal[2]);
          
-         gridColours.push(temp_colour[0]);
-         gridColours.push(temp_colour[1]);
-         gridColours.push(temp_colour[2]);
-         gridColours.push(temp_colour[3]);
+         GridMesh.vertices.push(gridSize); 
+         GridMesh.vertices.push(0);
+         GridMesh.vertices.push(i);
          
-         gridIndices.push(count);
+         GridMesh.vert_noramls.push(temp_Normal[0]);
+         GridMesh.vert_noramls.push(temp_Normal[1]);
+         GridMesh.vert_noramls.push(temp_Normal[2]);
+         
+         GridMesh.vert_colours.push(temp_colour[0]);
+         GridMesh.vert_colours.push(temp_colour[1]);
+         GridMesh.vert_colours.push(temp_colour[2]);
+         GridMesh.vert_colours.push(temp_colour[3]);
+         
+         GridMesh.Indices.push(count);
          count++;
-         
-  //console.log(i);
-  }
-  numOfGridLines = count-1;
-  // Create a buffer for the cube's vertices.
-  gridVerticesBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, gridVerticesBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gridVertices), gl.STATIC_DRAW);
-  
-    // Set up the normals for the vertices, so that we can compute lighting.
-  gridNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, gridNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gridNormals), gl.STATIC_DRAW);
-  
-  // Now set up the colors
-  gridVerticesColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, gridVerticesColorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gridColours), gl.STATIC_DRAW);
-
-
-  // Build the element array buffer; this specifies the indices
-  // into the vertex array for each face's vertices.
-  gridVerticesIndexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gridVerticesIndexBuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gridIndices), gl.STATIC_DRAW);
-  
-  //console.log(numOfGridLines);
+        }
+        
+        GridMesh.InitialiseBuffers();
+        GridMesh.meshType = MeshType.Lines;
 }
 
 
@@ -305,28 +279,8 @@ function initBuffers() {
 }
 
 function drawGrid() {
-  // Clear the canvas before we start drawing on it.
-
-  // Draw the cube by binding the array buffer to the cube's vertices
-  // array, setting attributes, and pushing it to GL.
-  gl.bindBuffer(gl.ARRAY_BUFFER, gridVerticesBuffer);
-  gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-    // Bind the normals buffer to the shader attribute.
-  gl.bindBuffer(gl.ARRAY_BUFFER, gridNormalBuffer);
-  gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
   
-  // Set the colors attribute for the vertices.
-  gl.bindBuffer(gl.ARRAY_BUFFER, gridVerticesColorBuffer);
-  gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
-  
-  // Draw the cube.
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gridVerticesIndexBuffer);
-  
-  setMatrixUniforms();
-  //gl.drawElements(gl.TRIANGLES, numOfElements, gl.UNSIGNED_SHORT, 0);
-  //gl.lineWidth(2);
-  gl.drawElements(gl.LINES, numOfGridLines, gl.UNSIGNED_SHORT, 0);
+  GridMesh.Draw();
   
 }
   
@@ -371,6 +325,14 @@ function drawScene() {
   
   drawGrid();
   
+  
+  //New elegent Drawing code
+  for(var i = 0; i < MeshCollection.length; i++)
+  {
+    MeshCollection[i].Draw();
+  }
+  
+  //Old Drawing Code Supported by some importers stil
   if(numOfElements> 0)
   {
   // Draw the cube by binding the array buffer to the cube's vertices
@@ -393,23 +355,17 @@ function drawScene() {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
   setMatrixUniforms();
   gl.drawElements(gl.TRIANGLES, numOfElements, gl.UNSIGNED_SHORT, 0);
-  //gl.lineWidth(5);
-  //gl.drawElements(gl.LINE_STRIP, numOfElements, gl.UNSIGNED_SHORT, 0);
   
   // Restore the original matrix
   }
-  mvPopMatrix();
   
-  // Update the rotation for the next draw, if it's time to do so.
-  
-  var currentTime = (new Date).getTime();
-  if (lastCubeUpdateTime) {
-    var delta = currentTime - lastCubeUpdateTime;
-    
-    //cubeRotation += (30 * delta) / 1000.0;
+  //New elegent Drawing code
+  for(var i = 0; i < MeshCollection.length; i++)
+  {
+    MeshCollection[i].Draw();
   }
   
-  lastCubeUpdateTime = currentTime;
+  mvPopMatrix();
 }
 
 //

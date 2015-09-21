@@ -2,7 +2,7 @@
 
 An HTML App which allows you to view 3D models in an HTML5/WebGL enviroment. 
 
-## To Install
+## To Run
 
 A working release isn't available yet, although if you'd like to try the current state of the app:
 
@@ -21,3 +21,4 @@ A working release isn't available yet, although if you'd like to try the current
   - Add Import/Export Capability
   - Choose Display Shader
   - Edit Shaders
+  - Object as well as face selection

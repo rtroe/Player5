@@ -7,7 +7,7 @@ function io_import_ply(FileName, InputFileText)
              data:[{
                  id: FileName,
                  text: FileName,
-                 iconCls: 'icon-large-picture',
+                 iconCls: 'icon-mesh',
                  checked:true
 
          }]

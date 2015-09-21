@@ -7,11 +7,15 @@ function io_import_obj(FileName, InputFileText)
              data:[{
                  id: FileName,
                  text: FileName,
-                 iconCls: 'icon-large-picture',
+                 iconCls: 'icon-mesh',
                  checked:true
 
          }]
     });
+    
+    
+    var NewMesh = new Mesh();
+    NewMesh.Name = FileName;
     
   /*******************************/
   //First initialise Arrarys
@@ -68,15 +72,27 @@ function io_import_obj(FileName, InputFileText)
        //Add group
        case 'o':
        case 'g':
+         
+         
+         if(NewMesh.vertices.length> 0){
+            NewMesh.InitialiseBuffers();
+            MeshCollection.push(NewMesh);
+            numOfElements += NewMesh.Indices.length;
+         }
+        
+        NewMesh = new Mesh();
+        NewMesh.Name = 'Group: ' + inputLine[1];
+         
           var dataThisLoop = {
           id: numOfElements,
-          text:'Group: ' + inputLine[1]
+          text:'Group: ' + inputLine[1],
+          checked:true
          };
          treeItems.push(dataThisLoop);
          
          break;
-       /*
-       //Add Face
+       
+      //Add Face
        case 'f':
          
         //Loop through each vertice collection in each line
@@ -88,72 +104,9 @@ function io_import_obj(FileName, InputFileText)
           
 
           //Should Always have Vertice Data
-          vertices.push(temp_vertices[(indexArray[0]-1)*3]);
-          vertices.push(temp_vertices[(indexArray[0]-1)*3+1]);
-          vertices.push(temp_vertices[(indexArray[0]-1)*3+2]);
-          
-         modelprop_Center[0] -= temp_vertices[(indexArray[0]-1)*3];
-         modelprop_Center[1] -= temp_vertices[(indexArray[0]-1)*3+1];
-         modelprop_Center[2] -= temp_vertices[(indexArray[0]-1)*3+2];
-
-          //TODO: Add in Texture Support
-
-
-          //Temp Normal
-          var temp_Normal = [1,1,1];
-
-          //Not all files specify Normal Data, Check, and then add if present
-          if(indexArray.length > 2){
-            temp_Normal[0] = temp_Normals[(indexArray[2]-1)*3];
-            temp_Normal[1] = temp_Normals[(indexArray[2]-1)*3+1];
-            temp_Normal[2] = temp_Normals[(indexArray[2]-1)*3+2];
-            console.log((indexArray[2]-1));
-          }
-
-          //Add In Normals
-          vertexNormals.push(temp_Normal[0]);
-          vertexNormals.push(temp_Normal[1]);
-          vertexNormals.push(temp_Normal[2]);
-          
-          //TODO: Add in Material Texture Support
-          generatedColors.push(temp_colour[0]);
-          generatedColors.push(temp_colour[1]);
-          generatedColors.push(temp_colour[2]);
-          generatedColors.push(temp_colour[3]);
-          
-          //Add in Element Indice
-          cubeVertexIndices.push(numOfElements);
-          numOfElements++;
-          }
-        }
-         break;
-         */
-     }
-    }
-    
-    for(line = 0; line < lines.length; line++){
-     
-     //First Split the Current Line into an Array split by any number of spaces
-     var re = /\s* \s*/;
-     var inputLine = lines[line].split(re);
-     
-     switch (inputLine[0])
-     {
-       //Add Face
-       case 'f':
-         
-        //Loop through each vertice collection in each line
-        for(var vrt = 1; vrt < inputLine.length; vrt++){
-          if(inputLine[vrt] !== ""){
-          
-          //Index Array
-          var indexArray = inputLine[vrt] .split("/");
-          
-
-          //Should Always have Vertice Data
-          vertices.push(temp_vertices[(indexArray[0]-1)*3]);
-          vertices.push(temp_vertices[(indexArray[0]-1)*3+1]);
-          vertices.push(temp_vertices[(indexArray[0]-1)*3+2]);
+          NewMesh.vertices.push(temp_vertices[(indexArray[0]-1)*3]);
+          NewMesh.vertices.push(temp_vertices[(indexArray[0]-1)*3+1]);
+          NewMesh.vertices.push(temp_vertices[(indexArray[0]-1)*3+2]);
           
          modelprop_Center[0] -= temp_vertices[(indexArray[0]-1)*3];
          modelprop_Center[1] -= temp_vertices[(indexArray[0]-1)*3+1];
@@ -174,19 +127,19 @@ function io_import_obj(FileName, InputFileText)
           }
 
           //Add In Normals
-          vertexNormals.push(temp_Normal[0]);
-          vertexNormals.push(temp_Normal[1]);
-          vertexNormals.push(temp_Normal[2]);
+          NewMesh.vert_noramls.push(temp_Normal[0]);
+          NewMesh.vert_noramls.push(temp_Normal[1]);
+          NewMesh.vert_noramls.push(temp_Normal[2]);
           
           //TODO: Add in Material Texture Support
-          generatedColors.push(temp_colour[0]);
-          generatedColors.push(temp_colour[1]);
-          generatedColors.push(temp_colour[2]);
-          generatedColors.push(temp_colour[3]);
+          NewMesh.vert_colours.push(temp_colour[0]);
+          NewMesh.vert_colours.push(temp_colour[1]);
+          NewMesh.vert_colours.push(temp_colour[2]);
+          NewMesh.vert_colours.push(temp_colour[3]);
           
           //Add in Element Indice
-          cubeVertexIndices.push(numOfElements);
-          numOfElements++;
+          NewMesh.Indices.push(NewMesh.Indices.length);
+          //numOfElements++;
           }
         }
          break;
@@ -197,42 +150,28 @@ function io_import_obj(FileName, InputFileText)
           $('#tt').tree('append', {
             parent: node2.target,
              data:treeItems
-    });
+             });
     
+    $('#tt').tree({onCheck: function(node,checked){   
+              //New elegent Drawing code
+  for(var i = 0; i < MeshCollection.length; i++)
+  {
+    if(MeshCollection[i].Name == node.text)
+        MeshCollection[i].Enabled = !node.checked;
+  }
+                }
+            });
+            
     //Set Model Center
     modelprop_Center[0] /= numOfElements;
     modelprop_Center[1] /= numOfElements;
     modelprop_Center[2] /= numOfElements;
+    
+    numOfElements = 0;
          
-    //Now that all of the data has been written in, 
-  // Create a buffer for the cube's vertices.
-  cubeVerticesBuffer = gl.createBuffer();
-  
-  // Select the cubeVerticesBuffer as the one to apply vertex operations to from here out.
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-
-  // Now pass the list of vertices into WebGL to build the shape. We
-  // do this by creating a Float32Array from the JavaScript array,
-  // then use it to fill the current vertex buffer.
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  
-  // Set up the normals for the vertices, so that we can compute lighting.
-  cubeVerticesNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
-  
-  // Now set up the colors for the faces. We'll use solid colors for each face.
-  
-  cubeVerticesColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(generatedColors), gl.STATIC_DRAW);
-
-  // Build the element array buffer; this specifies the indices
-  // into the vertex array for each face's vertices.
-  
-  cubeVerticesIndexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+NewMesh.InitialiseBuffers();
+MeshCollection.push(NewMesh);
+console.log(MeshCollection.length);
   
   $('#modelForm_Open').window('close');
   log("Done!");
