@@ -86,6 +86,9 @@ function getFileExtention(fileName){
         case "stl":
           io_import_stl(fileName, this.result);
           break;
+        case "ply":
+          io_import_ply(fileName, this.result);
+          break;
         default:
         alert("File Type .'" + fileExtention + "' Not Supported.\nIf this is a 3D file format and you would like this file type added, please contact us!");
         log("File Type .'" + fileExtention + "' Not Supported.\nIf you would like this file type added, please contact us!");

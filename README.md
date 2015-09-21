@@ -18,3 +18,5 @@ A working release isn't available yet, although if you'd like to try the current
 # Roadmap
   - Open Binary stl, ASCII fbx,  and 3ds files
   - Add Import/Export Capability
+  - Choose Display Shader
+  - Edit Shaders
