@@ -9,9 +9,8 @@ opacity: 1;
 background-color: #fff;
 z-index: 99;
 text-align: center;
-    -moz-transition: opacity 1s linear;
-    -o-transition: opacity 1s linear;
-    -webkit-transition: opacity 1s linear;
+		-webkit-transition: background-color 0;
+		transition: background-color 0;
 }
 #loading-image {
 position: absolute;
