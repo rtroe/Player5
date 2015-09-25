@@ -1,4 +1,8 @@
 <html>
+<div id="loading">
+  <p>VIRTEX EDGE DESIGN</p>
+<img id="loading-image" src="http://smallenvelop.com/wp-content/uploads/2014/08/Preloader_7.gif" alt="Loading..."/>
+</div>
   <head>
     <title>Vertices Viewer v. 0.1.2.2</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -8,9 +12,9 @@
 	  <!--<link rel="stylesheet" type="text/css" href="lib/jquery.easyui/themes/black/easyui.css">-->
 	  <link rel="stylesheet" type="text/css" href="css/theme.css">
 	  <link rel="stylesheet" type="text/css" href="lib/jquery.easyui/themes/icon.css">
-	  <script type="text/javascript" src="lib/jquery.easyui/jquery.min.js"></script>
-	  <script type="text/javascript" src="lib/jquery.easyui/jquery.easyui.min.js"></script>
-	  
+	  <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.min.js"></script>
+	  <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+
     <script src="js/ui/OnLoad.js" type="text/javascript"></script>
     <script src="js/mesh.js" type="text/javascript"></script>
     
@@ -63,6 +67,11 @@
         vLighting = ambientLight + (directionalLightColor * directional);
       }
     </script>
+    		<script>
+			$(window).load(function() {
+        $('#loading').hide();
+      });
+		</script>
   </head>
   
   
@@ -74,7 +83,7 @@
 MAIN MENU
 *****************************************************
 -->
-	<div data-options="region:'north',border:false," style="height:70px">
+	<div data-options="region:'north',border:false," style="height:40px">
 		<div class="easyui-panel" style="padding:5px;">
 		<a href="#" class="easyui-menubutton" data-options="plain:false,menu:'#mm_main',iconCls:'icon-large-clipart'"></a>
 		<a href="#" class="easyui-menubutton" data-options="plain:true,menu:'#mm_file'">File</a>
@@ -82,6 +91,7 @@ MAIN MENU
 		<a href="#" class="easyui-menubutton" data-options="menu:'#mm_tools'">Tools</a>
 		<a href="#" class="easyui-menubutton" data-options="menu:'#mm2'">Help</a>
 	</div>
+	<!--
 		<div style="padding:2px;;width:500px;">
     <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-cancel">Cancel</a>
     <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-reload">Refresh</a>
@@ -92,6 +102,7 @@ MAIN MENU
     <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-help"></a>
     <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-save"></a>
     <a href="#" class="easyui-linkbutton" plain="true" iconCls="icon-back"></a>
+    -->
 </div>
 <!-- MAIN -->
 	<div id="mm_main" style="width:100px; align:right">
@@ -187,34 +198,32 @@ MAIN MENU
 	  	<div class="easyui-panel" style="padding:5px">
 		<ul class="easyui-tree">
 			<li>
-				<span>My Documents</span>
+				<span>My Files</span>
 				<ul>
 					<li data-options="state:'closed'">
-						<span>Photos</span>
+						<span>Google Docs</span>
 						<ul>
 							<li>
-								<span>Friend</span>
+								<span>File 1</span>
 							</li>
 							<li>
-								<span>Wife</span>
+								<span>File 2</span>
 							</li>
 							<li>
-								<span>Company</span>
+								<span>File 3</span>
 							</li>
 						</ul>
 					</li>
 					<li>
-						<span>Program Files</span>
+						<span>Dropbox</span>
 						<ul>
-							<li>Intel</li>
-							<li>Java</li>
-							<li>Microsoft Office</li>
-							<li>Games</li>
+							<li>File 1</li>
+							<li>File 2</li>
+							<li>File 3</li>
+							<li>File 4</li>
 						</ul>
 					</li>
-					<li>index.html</li>
-					<li>about.html</li>
-					<li>welcome.html</li>
+					<li>Add Service</li>
 				</ul>
 			</li>
 		</ul>

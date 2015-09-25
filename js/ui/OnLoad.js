@@ -6,8 +6,11 @@ function OnLoadScript()
   log("Initializing Canvas");
   
   start('glcanvas');
-  
-  
+  /*
+  for(var i = 0; i < 1000; i++){
+    log(i);
+}
+*/
   var pg = $('#pg');
   
   /*
