@@ -13,6 +13,8 @@ function OnLoadScript()
 */
   var pg = $('#pg');
   
+  $('#tt').css("opacity", "0.75");
+  
   /*
   $('#tt').bind('mousewheel', function(e) {
     //Get Current Tree Position

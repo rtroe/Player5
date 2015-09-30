@@ -18,12 +18,12 @@ var GridMesh = new Mesh();
 
 //var cubeVerticesIndexBuffer;
 var numOfElements = 0;
-var cubeRotationX = 0.0;
-var cubeRotationY = 0.0;
+var cubeRotationX = 45;
+var cubeRotationY = 30;
 
 var lastCubeUpdateTime = 0;
 
-var Zoom = -6;
+var Zoom = -100;
 
 var mvMatrix;
 var shaderProgram;
@@ -291,7 +291,11 @@ function drawGrid() {
 //
 function drawScene() {
   // Clear the canvas before we start drawing on it.
-
+/*
+log('X:'+cubeRotationX);
+log('Y:'+cubeRotationY);
+log('z:'+Zoom);
+  */
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   
   // Set the viewport to match
