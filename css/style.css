@@ -1,0 +1,77 @@
+#loading {
+width: 100%;
+height: 100%;
+top: 0px;
+left: 0px;
+position: fixed;
+display: block;
+opacity: 1;
+background-color: #fff;
+z-index: 99;
+text-align: center;
+		-webkit-transition: background-color 0;
+		transition: background-color 0;
+}
+#loading-image {
+position: absolute;
+top: 50%;
+left: 50%;
+z-index: 600;
+}
+body {
+    font-family:verdana,helvetica,arial,sans-serif;
+    padding:20px;
+    font-size:12px;
+    margin:0;
+    background-color: gray;
+    overflow:hidden;
+    -webkit-transition: opacity 1s ease-in;
+		transition: opacity 1s ease-in;
+}
+
+canvas {
+	border: 1px solid black;
+	background-color: gray;
+	overflow:hidden;
+
+}
+div {    
+    position:relative;
+    overflow:hidden;
+}
+*{
+	font-size:12px;
+    overflow:hidden;
+}
+
+h2 {
+    font-size:18px;
+    font-weight:bold;
+    margin:0;
+    margin-bottom:15px;
+}
+.demo-info{
+	padding:0 0 12px 0;
+}
+.demo-tip{
+	display:none;
+}
+  #progress_bar {
+    margin: 10px 0;
+    padding: 3px;
+    border: 1px solid #000;
+    font-size: 14px;
+    clear: both;
+    opacity: 0;
+    -moz-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+  }
+  #progress_bar.loading {
+    opacity: 1.0;
+  }
+  #progress_bar .percent {
+    background-color: orange;
+    height: auto;
+    width: 0;
+  }
