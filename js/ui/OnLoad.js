@@ -6,15 +6,48 @@ function OnLoadScript()
   log("Initializing Canvas");
   
   start('glcanvas');
-  /*
-  for(var i = 0; i < 1000; i++){
-    log(i);
-}
-*/
+
+/*
+$(document).on("keypress", function (e) {
+    // use e.which
+    console.log(e.keyCode );
+});*/
+
+$(document).keydown(function (e) {
+    if (e.keyCode == 16) {
+    KeyboardState.Shift = true;
+    }
+});
+
+$(document).keyup(function (e) {
+    if (e.keyCode == 16) {
+     KeyboardState.Shift = false;
+    }
+});
+
   var pg = $('#pg');
   
+
+  $('#tt').tree({
+  onCheck: function(node, checked){
+   console.log(node.id);
+
+     //New elegent Drawing code
+    for(var i = 0; i < MeshCollection.length; i++)
+    {
+      if(node.text == MeshCollection[i].Name)
+        MeshCollection[i].Enabled = checked;
+    }
+  }
+});
+
   $('#tt').css("opacity", "0.75");
-  
+  $('#tt').mouseover(function() {
+  $('#tt').css("opacity", "1");
+});
+    $('#tt').mouseleave(function() {
+  $('#tt').css("opacity", "0.5");
+});
   /*
   $('#tt').bind('mousewheel', function(e) {
     //Get Current Tree Position
@@ -60,6 +93,8 @@ $('#mainPane').css("overflow", "hidden");
                  checked:true
          }]
     });
+
+    /*
 var rows = [
 	{"name":"Name","value":"Bill Smith","group":"ID Settings","editor":"text"},
 	{"name":"Address","value":"","group":"ID Settings","editor":"text"},
@@ -84,7 +119,10 @@ var row = {
   group:'Marketing Settings',    
   editor:'text'    
 };    
-$('#pg').propertygrid('appendRow',row);  
+$('#pg').propertygrid('appendRow',row); 
+
+*/
+
 }
 
 function log(Text)
