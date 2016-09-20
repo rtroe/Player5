@@ -14,7 +14,7 @@ function io_import_obj(FileName, InputFileText)
     });
     
     
-    var NewMesh = new Mesh();
+    var NewMesh = new vxMesh();
     NewMesh.Name = FileName;
     
   /*******************************/
@@ -80,7 +80,7 @@ function io_import_obj(FileName, InputFileText)
             numOfElements += NewMesh.Indices.length;
          }
         
-        NewMesh = new Mesh();
+        NewMesh = new vxMesh();
         NewMesh.Name = 'Group: ' + inputLine[1];
          
           var dataThisLoop = {

@@ -1,4 +1,4 @@
-function resize() {
+function OnResize() {
 
     var canvas = document.getElementById('glcanvas');
     var canvasRatio = canvas.height / canvas.width;
@@ -19,4 +19,4 @@ function resize() {
     canvas.style.height = height - offsetWidth + 'px';
 };
 
-window.addEventListener('resize', resize, false);
+window.addEventListener('resize', OnResize, false);

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<div id="loading">
+<img id="loading-image" src="http://smallenvelop.com/wp-content/uploads/2014/08/Preloader_7.gif" alt="Loading..."/>
+</div>
+<head>
+	<meta charset="UTF-8">
+	<title>Basic Combo - jQuery EasyUI Demo</title>
+
+	 <style>
+canvas {
+	border: 1px solid black;
+	background-color: gray;
+
+}
+div {    
+    position:relative;
+}
+
+#loading {
+width: 100%;
+height: 100%;
+top: 0px;
+left: 0px;
+position: fixed;
+display: block;
+opacity: .9;
+background-color: #fff;
+z-index: 99;
+text-align: center;
+		-webkit-transition: background-color 0;
+		transition: background-color 0;
+}
+#loading-image {
+position: absolute;
+top: 50%;
+left: 50%;
+z-index: 600;
+}
+		</style>
+			  <!--jQuery Easy UI Scripts -->
+	  <link rel="stylesheet" type="text/css" href="lib/jquery.easyui/themes/black/easyui.css">
+	  <link rel="stylesheet" type="text/css" href="lib/jquery.easyui/themes/icon.css">
+	  <script type="text/javascript" src="lib/jquery.easyui/jquery.min.js"></script>
+	  <script type="text/javascript" src="lib/jquery.easyui/jquery.easyui.min.js"></script>
+		<script>
+					var removeLoading = function() {
+    for(var i = 0; i < 1000; i++){
+    console.log('a');
+}
+			};
+			removeLoading();
+			
+$(window).load(function() {
+
+$('#loading').fadeOut();
+});
+		</script>
+</head>
+
+<body class="easyui-layout">
+	<div data-options="region:'north',border:false" style="height:60px;background:#B3DFDA;padding:10px">north region</div>
+	<div data-options="region:'west',split:true,title:'West'" style="width:150px;padding:10px;">west content</div>
+	<div data-options="region:'east',split:true,collapsed:true,title:'East'" style="width:100px;padding:10px;">east region</div>
+	<div data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;">south region</div>
+	<div id="parent" data-options="region:'center',title:'Center',
+			onResize:function(){
+		    var canvas = document.getElementById('respondCanvas');
+		      canvas.style.width='99%';
+          canvas.style.height='99%';
+          canvas.width  = canvas.offsetWidth;
+          canvas.height = canvas.offsetHeight;
+        console.log(canvas.width);
+			}">
+	 <div style="margin:20px 0;">
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#w').window('open')">Open</a>
+		<a href="javascript:void(0)"  class="easyui-linkbutton" onclick="$('#w').window('close')">Close</a>
+		<input type="file" id="files" name="files[]" multiple />
+<output id="list"></output>
+
+<script>
+  function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+
+    // files is a FileList of File objects. List some properties.
+    var output = [];
+    for (var i = 0, f; f = files[i]; i++) {
+      output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                  f.size, ' bytes, last modified: ',
+                  f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                  '</li>');
+    }
+    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+  }
+
+  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+
+	</div>
+	 <canvas id="respondCanvas" >
+      
+   </canvas>
+	</div>
+	
+	<div id="w" class="easyui-window" title="Modal Window" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:500px;height:200px;padding:10px;">
+		The window content.
+	</div>
+	
+</body>
+</html>

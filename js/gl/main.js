@@ -1,20 +1,39 @@
 var canvas;
 var gl;
 
+//var textCanvas;
+//var ctx;
+
 var modelprop_Center=[0,0,0];
 
-var modelprop_Radius=10;
+var modelprop_Radius=1;
 
-var cubeVerticesBuffer;
-var cubeVerticesColorBuffer;
-var cubeVerticesIndexBuffer;
+vxRenderState = {
+    ShadedEdge : 0,
+    Shaded : 1,
+    Wireframe : 2
+}
 
+var RenderState = vxRenderState.ShadedEdge;
+//var cubeVerticesBuffer;
+//var cubeVerticesColorBuffer;
+//var cubeVerticesIndexBuffer;
+
+//The Selection Index
+var HoverIndex = 0;
 
 //This is a collection of all of the current meshes
 var MeshCollection = [];
 
+//This is a collection of all of the current meshes
+var SelectedMeshCollection = [];
+
 //Grid Variables
-var GridMesh = new Mesh();
+var GridMesh = new vxMesh();
+var XAxisMesh = new vxMesh();
+var YAxisMesh = new vxMesh();
+var ZAxisMesh = new vxMesh();
+var HoveredMesh = new vxMesh();
 
 //var cubeVerticesIndexBuffer;
 var numOfElements = 0;
@@ -29,8 +48,23 @@ var mvMatrix;
 var shaderProgram;
 var vertexPositionAttribute;
 var vertexColorAttribute;
+var vertexSelColorAttribute;
+var hasTextureAttribute;
 var perspectiveMatrix;
 var elmntID;
+
+var MouseState = {
+  x: 0,
+  y: 0,
+  LeftButtonDown : false,
+  MiddleButtonDown : false,
+  RightButtonDown : false
+};
+
+var KeyboardState = {
+  Shift: false,
+};
+
 
 //
 // start
@@ -40,6 +74,11 @@ var elmntID;
 function start(elementID) {
   elmntID = elementID;
   canvas = document.getElementById(elmntID);
+  // look up the text canvas.
+ //textCanvas = document.getElementById("text");
+ 
+// make a 2D context for it
+ //ctx = textCanvas.getContext("2d");
 
   log("Initializing WebGL");
   initWebGL(canvas);      // Initialize the GL context
@@ -54,7 +93,7 @@ function start(elementID) {
 	
     canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
-    document.onmousemove = handleMouseMove;
+    canvas.onmousemove = handleMouseMove;
     
     
   log("Setting Up Event Listerners");
@@ -79,40 +118,14 @@ function start(elementID) {
     
   log("Initializing Buffers");
     initBuffers();
-	
+
+
     // Set up to draw the scene periodically.
     
     setInterval(drawScene, 15);
   }
 }
 
-function loadTeapot() {
-    var request = new XMLHttpRequest();
-    //request.open("GET", "images/cubetexture.png");
-    request.open("GET", "images/test.txt");
-    request.onreadystatechange = function() {
-      if (request.readyState == 4) {
-        alert(request.responseText);
-      }
-    };
-    request.send();
-  }
-  
-  function initTextures() {
-  cubeTexture = gl.createTexture();
-  cubeImage = new Image();
-  cubeImage.onload = function() { handleTextureLoaded(cubeImage, cubeTexture); }
-  cubeImage.src = "images/cubetexture.png";
-}
-
-function handleTextureLoaded(image, texture) {
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-  gl.generateMipmap(gl.TEXTURE_2D);
-  gl.bindTexture(gl.TEXTURE_2D, null);
-}
 
 //
 // initWebGL
@@ -144,7 +157,10 @@ function initWebGL() {
 //
 function initBuffers() {
   
-  var gridSize = 100;
+  var gridSize = 250;
+
+          var vert = new vxVertex3D(1,2,3);
+          console.log(vert.X);
 
   numOfElements = 0;
   var temp_Normal = [0,0,0];
@@ -152,12 +168,16 @@ function initBuffers() {
   var temp_colour = [ 0.825, 0.825, 0.825, 1];     
   var count = 0;
   /* Load In Vertex and Colour Data */
-  for(var i = -gridSize; i < gridSize+1; i+=10)
+  for(var i = -gridSize; i < gridSize+1; i+=5)
   {
+    if(i%20 == 0)
+      temp_colour = [ 1, 1, 1, 1];   
+    else
+      temp_colour = [ 0.7, 0.7, 0.7, 1];   
     // First Point is (i, 0, -gridSize)
-         GridMesh.vertices.push(i);
-         GridMesh.vertices.push(0);
-         GridMesh.vertices.push(-gridSize); 
+         GridMesh.mesh_vertices.push(i);
+         GridMesh.mesh_vertices.push(0);
+         GridMesh.mesh_vertices.push(-gridSize); 
          
          GridMesh.vert_noramls.push(temp_Normal[0]);
          GridMesh.vert_noramls.push(temp_Normal[1]);
@@ -174,9 +194,9 @@ function initBuffers() {
          
          
          
-         GridMesh.vertices.push(i);
-         GridMesh.vertices.push(0);
-         GridMesh.vertices.push(gridSize); 
+         GridMesh.mesh_vertices.push(i);
+         GridMesh.mesh_vertices.push(0);
+         GridMesh.mesh_vertices.push(gridSize); 
          
          GridMesh.vert_noramls.push(temp_Normal[0]);
          GridMesh.vert_noramls.push(temp_Normal[1]);
@@ -193,9 +213,9 @@ function initBuffers() {
          
          
          
-         GridMesh.vertices.push(-gridSize); 
-         GridMesh.vertices.push(0);
-         GridMesh.vertices.push(i);
+         GridMesh.mesh_vertices.push(-gridSize); 
+         GridMesh.mesh_vertices.push(0);
+         GridMesh.mesh_vertices.push(i);
          
          GridMesh.vert_noramls.push(temp_Normal[0]);
          GridMesh.vert_noramls.push(temp_Normal[1]);
@@ -211,9 +231,9 @@ function initBuffers() {
          
          
          
-         GridMesh.vertices.push(gridSize); 
-         GridMesh.vertices.push(0);
-         GridMesh.vertices.push(i);
+         GridMesh.mesh_vertices.push(gridSize); 
+         GridMesh.mesh_vertices.push(0);
+         GridMesh.mesh_vertices.push(i);
          
          GridMesh.vert_noramls.push(temp_Normal[0]);
          GridMesh.vert_noramls.push(temp_Normal[1]);
@@ -230,6 +250,136 @@ function initBuffers() {
         
         GridMesh.InitialiseBuffers();
         GridMesh.meshType = MeshType.Lines;
+
+
+
+// The X Axis
+  var xcolour = [1, 0, 0, 1]; 
+        XAxisMesh.mesh_vertices.push(0);
+         XAxisMesh.mesh_vertices.push(0);
+         XAxisMesh.mesh_vertices.push(0); 
+         
+         XAxisMesh.vert_noramls.push(0);
+         XAxisMesh.vert_noramls.push(1);
+         XAxisMesh.vert_noramls.push(0);
+         
+         XAxisMesh.vert_colours.push(xcolour[0]);
+         XAxisMesh.vert_colours.push(xcolour[1]);
+         XAxisMesh.vert_colours.push(xcolour[2]);
+         XAxisMesh.vert_colours.push(xcolour[3]);
+         
+         XAxisMesh.Indices.push(0);
+
+         XAxisMesh.mesh_vertices.push(10);
+         XAxisMesh.mesh_vertices.push(0);
+         XAxisMesh.mesh_vertices.push(0); 
+         
+         XAxisMesh.vert_noramls.push(0);
+         XAxisMesh.vert_noramls.push(1);
+         XAxisMesh.vert_noramls.push(0);
+         
+         XAxisMesh.vert_colours.push(xcolour[0]);
+         XAxisMesh.vert_colours.push(xcolour[1]);
+         XAxisMesh.vert_colours.push(xcolour[2]);
+         XAxisMesh.vert_colours.push(xcolour[3]);
+         
+         XAxisMesh.Indices.push(1);
+        XAxisMesh.InitialiseBuffers();
+        XAxisMesh.meshType = MeshType.Lines;
+         
+
+// The Y Axis
+  var ycolour = [0, 1, 0, 1]; 
+        YAxisMesh.mesh_vertices.push(0);
+         YAxisMesh.mesh_vertices.push(0);
+         YAxisMesh.mesh_vertices.push(0); 
+         
+         YAxisMesh.vert_noramls.push(0);
+         YAxisMesh.vert_noramls.push(1);
+         YAxisMesh.vert_noramls.push(0);
+         
+         YAxisMesh.vert_colours.push(ycolour[0]);
+         YAxisMesh.vert_colours.push(ycolour[1]);
+         YAxisMesh.vert_colours.push(ycolour[2]);
+         YAxisMesh.vert_colours.push(ycolour[3]);
+         
+         YAxisMesh.Indices.push(0);
+
+         YAxisMesh.mesh_vertices.push(0);
+         YAxisMesh.mesh_vertices.push(10);
+         YAxisMesh.mesh_vertices.push(0); 
+         
+         YAxisMesh.vert_noramls.push(0);
+         YAxisMesh.vert_noramls.push(1);
+         YAxisMesh.vert_noramls.push(0);
+         
+         YAxisMesh.vert_colours.push(ycolour[0]);
+         YAxisMesh.vert_colours.push(ycolour[1]);
+         YAxisMesh.vert_colours.push(ycolour[2]);
+         YAxisMesh.vert_colours.push(ycolour[3]);
+         
+         YAxisMesh.Indices.push(1);
+        YAxisMesh.InitialiseBuffers();
+        YAxisMesh.meshType = MeshType.Lines;
+
+
+// The Z Axis
+  var zcolour = [0.25, 0.5, 1, 1]; 
+        ZAxisMesh.mesh_vertices.push(0);
+         ZAxisMesh.mesh_vertices.push(0);
+         ZAxisMesh.mesh_vertices.push(0); 
+         
+         ZAxisMesh.vert_noramls.push(0);
+         ZAxisMesh.vert_noramls.push(1);
+         ZAxisMesh.vert_noramls.push(0);
+         
+         ZAxisMesh.vert_colours.push(zcolour[0]);
+         ZAxisMesh.vert_colours.push(zcolour[1]);
+         ZAxisMesh.vert_colours.push(zcolour[2]);
+         ZAxisMesh.vert_colours.push(zcolour[3]);
+         
+         ZAxisMesh.Indices.push(0);
+
+         ZAxisMesh.mesh_vertices.push(0);
+         ZAxisMesh.mesh_vertices.push(0);
+         ZAxisMesh.mesh_vertices.push(10); 
+         
+         ZAxisMesh.vert_noramls.push(0);
+         ZAxisMesh.vert_noramls.push(1);
+         ZAxisMesh.vert_noramls.push(0);
+         
+         ZAxisMesh.vert_colours.push(zcolour[0]);
+         ZAxisMesh.vert_colours.push(zcolour[1]);
+         ZAxisMesh.vert_colours.push(zcolour[2]);
+         ZAxisMesh.vert_colours.push(zcolour[3]);
+         
+         ZAxisMesh.Indices.push(1);
+        ZAxisMesh.InitialiseBuffers();
+        ZAxisMesh.meshType = MeshType.Lines;
+        
+
+
+
+  var sel_colour = [ 0.1, 0.6, 1, 1];  
+        for(var i = 0; i < 3; i++)
+        {
+          HoveredMesh.mesh_vertices.push(0); 
+          HoveredMesh.mesh_vertices.push(0);
+          HoveredMesh.mesh_vertices.push(0);
+        
+          HoveredMesh.vert_noramls.push(0);
+          HoveredMesh.vert_noramls.push(1);
+          HoveredMesh.vert_noramls.push(0);
+        
+          HoveredMesh.vert_colours.push(sel_colour[0]);
+          HoveredMesh.vert_colours.push(sel_colour[1]);
+          HoveredMesh.vert_colours.push(sel_colour[2]);
+          HoveredMesh.vert_colours.push(sel_colour[3]);
+
+          HoveredMesh.Indices.push(i);
+        }
+
+        HoveredMesh.InitialiseBuffers();
 }
 
 
@@ -238,29 +388,117 @@ function initBuffers() {
   var lastMouseX = null;
   var lastMouseY = null;
 
+  function LeftMouseClickEvent() {
+
+    //Only clear the Selected Mesh Collection if the Shift key is up
+    if(KeyboardState.Shift == false)
+      SelectedMeshCollection.length = 0;
+
+      if(HoverIndex > 0){
+        var newMesh = new vxMesh();
+        
+var ind = 0;
+        var sel_colour = [ 0.1, 1, 0.6, 1];  
+        for(var i = 0; i < 9; i+=3)
+        {
+          newMesh.mesh_vertices.push(HoveredMesh.mesh_vertices[i]); 
+          newMesh.mesh_vertices.push(HoveredMesh.mesh_vertices[i+1]);
+          newMesh.mesh_vertices.push(HoveredMesh.mesh_vertices[i+2]);
+        
+          newMesh.vert_noramls.push(0);
+          newMesh.vert_noramls.push(1);
+          newMesh.vert_noramls.push(0);
+        
+          newMesh.vert_colours.push(sel_colour[0]);
+          newMesh.vert_colours.push(sel_colour[1]);
+          newMesh.vert_colours.push(sel_colour[2]);
+          newMesh.vert_colours.push(sel_colour[3]);
+
+          newMesh.Indices.push(ind);
+          ind++;
+        }
+
+        newMesh.InitialiseBuffers();
+
+      SelectedMeshCollection.push(newMesh);
+
+      var rows = [
+  {"name":"Mesh Name","value":MeshCollection[0].Name,"group":"Mesh Settings","editor":"text"},
+  {"name":"Faces","value":MeshCollection[0].Indices.length/3,"group":"Mesh Settings","editor":"text"},
+  {"name":"mesh_vertices","value":MeshCollection[0].mesh_vertices.length/3,"group":"Mesh Settings","editor":"text"},
+
+  {"name":"Name","value":"face"+HoverIndex,"group":"Selected Face","editor":"text"},
+  {"name":"Normal","value": "("+newMesh.vert_noramls[0] + "," + newMesh.vert_noramls[1] +"," + newMesh.vert_noramls[2]+")","group":"Selected Face","editor":"text"},
+  {"name":"mesh_vertices 1","value": "("+newMesh.mesh_vertices[0] + "," + newMesh.mesh_vertices[1] +"," + newMesh.mesh_vertices[2]+")","group":"Selected Face","editor":"text"},
+  {"name":"mesh_vertices 2","value": "("+newMesh.mesh_vertices[3] + "," + newMesh.mesh_vertices[4] +"," + newMesh.mesh_vertices[5]+")","group":"Selected Face","editor":"text"},
+  {"name":"mesh_vertices 3","value": "("+newMesh.mesh_vertices[6] + "," + newMesh.mesh_vertices[7] +"," + newMesh.mesh_vertices[8]+")","group":"Selected Face","editor":"text"},
+
+];
+$("#pg").propertygrid('loadData',rows);
+    }
+  }
+
+
   function handleMouseDown(event) {
     mouseDown = true;
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
+
+    // Get's the Mouse State
+    switch(event.button)
+    {
+      case 0:
+        MouseState.LeftButtonDown = true;
+        LeftMouseClickEvent();
+      break;
+      case 1:
+        MouseState.MiddleButtonDown = true;
+      break;
+      case 2:
+        MouseState.RightButtonDown = true;
+      break;
+    }
   }
 
   function handleMouseUp(event) {
     mouseDown = false;
-    //log("set Rotation ("+ cubeRotationX + ", "+ cubeRotationY+")");
+    
+    // Get's the Mouse State
+    switch(event.button)
+    {
+      case 0:
+        MouseState.LeftButtonDown = false;
+      break;
+      case 1:
+        MouseState.MiddleButtonDown = false;
+      break;
+      case 2:
+        MouseState.RightButtonDown = false;
+      break;
+    }
   }
 
   function handleMouseMove(event) {
+    var rect = canvas.getBoundingClientRect();
+
+    MouseState.x = event.clientX - rect.left;
+    MouseState.y = event.clientY - rect.top;    
+
     if (!mouseDown) {
       return;
     }
+
+    if(MouseState.MiddleButtonDown)
+    {
     var newX = event.clientX;
     var newY = event.clientY;
 
-	cubeRotationX += newX - lastMouseX;
-	cubeRotationY += newY - lastMouseY;
+	   cubeRotationX += newX - lastMouseX;
+    	cubeRotationY += newY - lastMouseY;
 
     lastMouseX = newX;
     lastMouseY = newY;
+    }
   }
   
   function ResetRotation() {
@@ -281,6 +519,8 @@ function initBuffers() {
 function drawGrid() {
   
   GridMesh.Draw();
+
+
   
 }
   
@@ -290,13 +530,12 @@ function drawGrid() {
 // Draw the scene.
 //
 function drawScene() {
+  
   // Clear the canvas before we start drawing on it.
-/*
-log('X:'+cubeRotationX);
-log('Y:'+cubeRotationY);
-log('z:'+Zoom);
-  */
+  gl.clearColor(0,0,0,1) // Clear to black, fully opaque
+  gl.clearDepth(1.0);                 // Clear everything
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
   
   // Set the viewport to match
   gl.viewport(0, 0, canvas.width, canvas.height);
@@ -317,59 +556,158 @@ log('z:'+Zoom);
   // drawing the cube.
   
   mvTranslate([-0.0, 0.0, Zoom]);
+  mvRotate(cubeRotationY, [1, 0, 0]);
+  mvRotate(cubeRotationX, [0, 1, 0]);
+  //Next Center the scene around the model
+  mvTranslate(modelprop_Center);
   
   // Save the current matrix, then rotate before we draw.
   
   mvPushMatrix();
-  mvRotate(cubeRotationY, [1, 0, 0]);
-  mvRotate(cubeRotationX, [0, 1, 0]);
   
-  //Next Center the scene around the model
-  mvTranslate(modelprop_Center);
   
+// Draw Mesh with Encoded Index Colour for Selection
+//***************************************************************************************
+  gl.uniform1i(hasTextureAttribute, 0);
+
+    for(var i = 0; i < MeshCollection.length; i++)
+  {
+    MeshCollection[i].DrawSelPreProc();
+  }
+
+// Get Selection Information
+//***************************************************************************************
+var pixels = new Uint8Array(4);
+gl.readPixels(MouseState.x,gl.drawingBufferHeight - MouseState.y, 1,1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+HoverIndex = 0;
+HoverIndex = pixels[0] + pixels[1] * 255 + pixels[2] * 255 * 255;
+
+//console.log(HoverIndex); 
+
+  gl.clearColor(0.20, 0.20, 0.20, 1.0);  // Clear to black, fully opaque
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  gl.uniform1i(hasTextureAttribute, 1);
   drawGrid();
   
-  
+if(RenderState != vxRenderState.Wireframe)
+{
   //New elegent Drawing code
   for(var i = 0; i < MeshCollection.length; i++)
   {
-    MeshCollection[i].Draw();
+      MeshCollection[i].Draw();
+    /*
+    if(RenderState != vxRenderState.Wireframe)
+    {
+      MeshCollection[i].Draw();
+    }
+    else
+    {   MeshCollection[i].DrawWireframe();
+    }
+    */
   }
-  
-  //Old Drawing Code Supported by some importers stil
-  if(numOfElements> 0)
+}
+
+
+
+ // Only find index is selection is greater than 0
+ if(HoverIndex > 0)
+ {
+    //Now Finally Draw the Face
+  for(var i = 0; i < 9; i++)
+    HoveredMesh.mesh_vertices[i] = MeshCollection[0].mesh_vertices[(HoverIndex - 1) * 9 + i];
+
+    HoveredMesh.InitialiseBuffers();
+  }
+  else
   {
-  // Draw the cube by binding the array buffer to the cube's vertices
-  // array, setting attributes, and pushing it to GL.
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-  gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-  
-  
-    // Bind the normals buffer to the shader attribute.
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
-  gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
-  
-  
-  // Set the colors attribute for the vertices.
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColorBuffer);
-  gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
-  
-  
-  // Draw the cube.
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
-  setMatrixUniforms();
-  gl.drawElements(gl.TRIANGLES, numOfElements, gl.UNSIGNED_SHORT, 0);
-  
-  // Restore the original matrix
+      for(var i = 0; i < 9; i++)
+    HoveredMesh.mesh_vertices[i] = 0;
+
+    HoveredMesh.InitialiseBuffers();
   }
-  
-  //New elegent Drawing code
+
+HoveredMesh.Draw();
+
+
+
+
+
+//Last thing to draw is the Selection
+
+  for(var i = 0; i < SelectedMeshCollection.length; i++)
+  {
+    SelectedMeshCollection[i].Draw();
+  }
+
+
+  gl.uniform1i(hasTextureAttribute, 2);
+
+// Only Draw Edges if the Shaded Edge Settings is set
+
+   //New elegent Drawing code
   for(var i = 0; i < MeshCollection.length; i++)
   {
-    MeshCollection[i].Draw();
+    if(RenderState == vxRenderState.ShadedEdge)
+    {
+      MeshCollection[i].DrawEdge();
+    }
+    if(RenderState == vxRenderState.Wireframe)
+    {
+      MeshCollection[i].DrawWireframe();
+    }
   }
-  
+
+
   mvPopMatrix();
+
+
+
+  //gl.clearColor(0,0,0,1) // Clear to black, fully opaque
+  //gl.clearDepth(1.0);                 // Clear everything
+  //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  var size = 80;
+  // Set the viewport to match
+  gl.viewport(canvas.width - size, canvas.height - size, size, size);
+  
+  // Establish the perspective with which we want to view the
+  // scene. Our field of view is 45 degrees, with a width/height
+  // ratio of 640:480, and we only want to see objects between 0.1 units
+  // and 100 units away from the camera.
+  
+  perspectiveMatrix = makePerspective(45, 1, 0.1, 10000.0);
+  
+  // Set the drawing position to the "identity" point, which is
+  // the center of the scene.
+  
+  loadIdentity();
+  
+  // Save the current matrix, then rotate before we draw.
+  mvTranslate([-0.0, 0.0, -size/2]);
+  mvPushMatrix();
+  mvRotate(cubeRotationY, [1, 0, 0]);
+  mvRotate(cubeRotationX, [0, 1, 0]);
+
+setMatrixUniforms();
+
+  gl.uniform1i(hasTextureAttribute, 1);
+  //drawGrid();
+  XAxisMesh.Draw();
+  YAxisMesh.Draw();
+  ZAxisMesh.Draw();
+
+
+  mvPopMatrix();
+
+
+
+/*
+   // Clear the 2D canvas
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillText("someMsg", 200, 200);
+    ctx.fillStyle = "#ddd";
+    */
 }
 
 //
@@ -404,6 +742,13 @@ function initShaders() {
   
   vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
   gl.enableVertexAttribArray(vertexColorAttribute);
+
+  //vertexSelColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexSelColor");
+  //gl.enableVertexAttribArray(vertexSelColorAttribute);
+
+
+  hasTextureAttribute = gl.getUniformLocation(shaderProgram, "aHasTexture");
+
 }
 
 
@@ -523,4 +868,33 @@ function mvRotate(angle, v) {
   
   var m = Matrix.Rotation(inRadians, $V([v[0], v[1], v[2]])).ensure4x4();
   multMatrix(m);
+}
+
+
+function loadTeapot() {
+    var request = new XMLHttpRequest();
+    //request.open("GET", "images/cubetexture.png");
+    request.open("GET", "images/test.txt");
+    request.onreadystatechange = function() {
+      if (request.readyState == 4) {
+        alert(request.responseText);
+      }
+    };
+    request.send();
+  }
+  
+  function initTextures() {
+  cubeTexture = gl.createTexture();
+  cubeImage = new Image();
+  cubeImage.onload = function() { handleTextureLoaded(cubeImage, cubeTexture); }
+  cubeImage.src = "images/cubetexture.png";
+}
+
+function handleTextureLoaded(image, texture) {
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.bindTexture(gl.TEXTURE_2D, null);
 }
